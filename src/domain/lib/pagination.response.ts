@@ -1,4 +1,4 @@
-export class PaginationResponse 
+export class PaginationResponse
 {
     constructor(
         public readonly total: number,
