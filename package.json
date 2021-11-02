@@ -20,11 +20,13 @@
   "dependencies": {
     "@nestjs/sequelize": "^8.0.0",
     "bcrypt": "^5.0.1",
+    "clean-deep": "^3.4.0",
     "dayjs": "^1.10.7",
     "mysql2": "^2.3.0",
     "sequelize": "^6.6.5",
     "sequelize-typescript": "^2.1.0",
-    "sqlite3": "^5.0.2"
+    "sqlite3": "^5.0.2",
+    "uuid-validate": "0.0.3"
   },
   "peerDependencies": {
     "@nestjs/common": "^8.0.0",
@@ -54,7 +56,6 @@
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
     "apollo-server-express": "^3.3.0",
-    "clean-deep": "^3.4.0",
     "eslint": "^7.30.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
@@ -75,8 +76,7 @@
     "ts-loader": "^9.2.3",
     "ts-node": "^10.0.0",
     "tsconfig-paths": "^3.10.1",
-    "typescript": "^4.3.5",
-    "uuid-validate": "0.0.3"
+    "typescript": "^4.3.5"
   },
   "jest": {
     "moduleFileExtensions": [

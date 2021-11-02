@@ -1,7 +1,9 @@
-
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 
+/**
+ * Controller for GCP to manage application live
+ */
 @ApiTags('[core] gcp')
 @Controller('_ah/warmup')
 export class CorePreparationRequestController
