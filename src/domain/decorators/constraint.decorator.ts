@@ -21,10 +21,6 @@ export const Constraint = createParamDecorator(
         }
 
         // get body constraint
-        let constraint = request.body['constraint'];
-
-        if (data?.i18N) constraint = Object.assign({}, constraint, { include: { association: data.i18N, required: true, where: { langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a' }}});
-
-        return constraint;
+        return request.body['constraint'];
     }
 );

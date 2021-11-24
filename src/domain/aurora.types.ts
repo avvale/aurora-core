@@ -13,6 +13,13 @@ export interface DataValueObject
     removeTimezone?: string,
 }
 
+export enum FormatLangCode
+{
+    iso6392,
+    iso6393,
+    ietf
+}
+
 export interface HookResponse
 {
     queryStatement?: QueryStatement,
