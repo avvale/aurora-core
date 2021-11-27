@@ -99,4 +99,9 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
     {
         if (!Array.isArray(queryStatement) || queryStatement.length === 0) throw new BadRequestException('To delete multiple records, you must define a query statement');
     }
+
+    async count(queryStatement: QueryStatement): Promise<number>
+    {
+        return this.collectionSource.length;
+    }
 }
