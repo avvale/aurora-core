@@ -220,4 +220,21 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             this.criteria.implements(_.merge(query, constraint), cQMetadata)
         );
     }
+
+    // count records
+    async count(queryStatement?: QueryStatement, constraint?: QueryStatement, cQMetadata?: CQMetadata): Promise<number>
+    {
+        // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
+        const hookResponse = this.composeStatementCountHook(_.merge(queryStatement, constraint), cQMetadata);
+
+        const nRecords = await this.repository.count(
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata)
+        );
+
+        return nRecords;
+    }
+
+    // hook to add count
+    composeStatementCountHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
 }
