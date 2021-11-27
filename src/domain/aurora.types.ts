@@ -15,9 +15,10 @@ export interface DataValueObject
 
 export enum FormatLangCode
 {
+    ID = 'id',
+    IETF = 'ietf',
     ISO6392 = 'iso6392',
     ISO6393 = 'iso6393',
-    IETF = 'ietf',
 }
 
 export interface HookResponse
