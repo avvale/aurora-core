@@ -156,18 +156,21 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     // hook called after insert aggregates
     async insertedAggregateHook(aggregates: Aggregate[]):Promise<void> { /**/ }
 
-    async update(aggregate: Aggregate, constraint?: QueryStatement, cQMetadata?: CQMetadata, dataFactory: (aggregate: Aggregate) => ObjectLiteral = (aggregate: Aggregate) => aggregate.toDTO()): Promise<void>
+    async update(
+        aggregate: Aggregate,
+        constraint?: QueryStatement,
+        cQMetadata?: CQMetadata,
+        dataFactory: (aggregate: Aggregate) => ObjectLiteral = (aggregate: Aggregate) => aggregate.toDTO(),
+        // arguments to find object to update, with i18n we use langId and id relationship with parent entity
+        findArguments: ObjectLiteral = { id: aggregate['id']['value'] },
+    ): Promise<void>
     {
         // check that model exist
         const modelInDB = await this.repository.findOne(
             // pass constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(
                 _.merge(
-                    {
-                        where: {
-                            id: aggregate['id']['value']
-                        }
-                    },
+                    { where: findArguments },
                     constraint
                 ), cQMetadata
             )
