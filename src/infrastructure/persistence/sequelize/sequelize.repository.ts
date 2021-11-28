@@ -1,6 +1,5 @@
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { Model } from 'sequelize-typescript';
-import cleanDeep from 'clean-deep';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
 import { ICriteria } from '../../../domain/persistence/criteria';
@@ -9,6 +8,9 @@ import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object
 import { AggregateBase } from '../../../domain/lib/aggregate-base';
 import { Pagination } from '../../../domain/lib/pagination';
 import * as _ from 'lodash';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cleanDeep = require('clean-deep');
 
 export abstract class SequelizeRepository<Aggregate extends AggregateBase, ModelClass>
 {
@@ -173,7 +175,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         if (!modelInDB) throw new NotFoundException(`${this.aggregateName} not found`);
 
-        // clean undefined fields
+        // clean undefined fields, to avoid update undefined fields
         const objectLiteral = cleanDeep(dataFactory(aggregate), {
             nullValues  : false,
             emptyStrings: false,
