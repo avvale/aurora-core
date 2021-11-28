@@ -3,10 +3,10 @@ import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
 import { ICriteria } from '../../../domain/persistence/criteria';
-import { IMapper } from '../../../domain/lib/mapper';
+import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
-import { AggregateBase } from '../../../domain/lib/aggregate-base';
-import { Pagination } from '../../../domain/lib/pagination';
+import { AggregateBase } from '../../../domain/shared/aggregate-base';
+import { Pagination } from '../../../domain/shared/pagination';
 import * as _ from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

@@ -8,7 +8,7 @@ dayjs.extend(timezone);
 import { ICriteria } from '../../../domain/persistence/criteria';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata } from '../../../domain/aurora.types';
-import { Utils } from '../../../domain/lib/utils';
+import { Utils } from '../../../domain/shared/utils';
 
 export class SequelizeCriteria implements ICriteria
 {

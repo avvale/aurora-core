@@ -1,7 +1,7 @@
 import { QueryStatement } from './sql-statement/sql-statement';
 import { ValueObject } from '../value-objects/value-object';
 import { CQMetadata, ObjectLiteral } from '../aurora.types';
-import { Pagination } from '../lib/pagination';
+import { Pagination } from '../shared/pagination';
 
 export interface IRepository<Aggregate>
 {

@@ -1,5 +1,5 @@
 import { StringValueObject } from './string.value-object';
-import { Utils } from './../lib/utils';
+import { Utils } from '../shared/utils';
 
 export abstract class PasswordValueObject extends StringValueObject
 {

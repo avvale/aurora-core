@@ -1,8 +1,8 @@
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
-import { Pagination } from '../../../domain/lib/pagination';
+import { Pagination } from '../../../domain/shared/pagination';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
-import { AggregateBase } from '../../../domain/lib/aggregate-base';
+import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
 import cleanDeep from 'clean-deep';
 

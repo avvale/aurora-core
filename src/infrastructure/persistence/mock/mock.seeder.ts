@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { AggregateBase } from '../../../domain/lib/aggregate-base';
+import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
 
 @Injectable()

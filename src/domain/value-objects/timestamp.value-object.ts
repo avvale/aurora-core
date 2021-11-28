@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { StringValueObject } from './string.value-object';
-import { Utils } from '../lib/utils';
+import { Utils } from '../shared/utils';
 import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import * as dayjs from 'dayjs';
