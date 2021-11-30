@@ -16,9 +16,6 @@ dayjs.extend(advancedFormat);
 
 export class Utils
 {
-    // TODO, create interface and decouple
-    constructor() { /**/ }
-
     public static now(): dayjs.Dayjs
     {
         return dayjs();
@@ -105,8 +102,7 @@ export class Utils
         // set to lowercase and delete . character
         extension = extension.toLowerCase().replace(/\./g, '');
 
-        // TODO, revisar esto
-        return ''; // mime.getType(extension);
+        return mime.getType(extension);
     }
 
     public static isImageMime(mime: string)
