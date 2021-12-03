@@ -1,7 +1,7 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-export const Constraint = createParamDecorator(
+export const ContentLanguage = createParamDecorator(
     (data: unknown, context: ExecutionContext) =>
     {
         let request;
@@ -15,6 +15,6 @@ export const Constraint = createParamDecorator(
             request = context.switchToHttp().getRequest();
         }
 
-        return request.body['constraint'];
+        return request.headers['content-language'];
     }
 );
