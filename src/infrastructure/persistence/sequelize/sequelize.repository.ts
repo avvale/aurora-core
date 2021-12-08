@@ -118,16 +118,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     // ** side effects **
     // ******************
 
-    async create(aggregate: Aggregate, dataFactory: (aggregate: Aggregate) => ObjectLiteral = (aggregate: Aggregate) => aggregate.toDTO()): Promise<void>
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    async create(
+        aggregate: Aggregate,
+        dataFactory: (aggregate: Aggregate) => ObjectLiteral = (aggregate: Aggregate) => aggregate.toDTO(),
+        finderQueryStatement: (aggregate: Aggregate) => QueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }})
+    )
     {
         // check if exist object in database, if allow save aggregate with the same uuid, update this aggregate in database instead of create it
-        const modelInDB = await this.repository.findOne(
-            {
-                where: {
-                    id: aggregate['id']['value']
-                }
-            }
-        );
+        const modelInDB = await this.repository.findOne(finderQueryStatement);
 
         if (modelInDB) throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate['id']['value']} already exist in database`);
 
