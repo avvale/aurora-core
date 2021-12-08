@@ -4,7 +4,9 @@ import { Pagination } from '../../../domain/shared/pagination';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
-import cleanDeep from 'clean-deep';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const cleanDeep = require('clean-deep');
 
 @Injectable()
 export abstract class MockRepository<Aggregate extends AggregateBase>
