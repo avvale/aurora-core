@@ -126,7 +126,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     )
     {
         // check if exist object in database, if allow save aggregate with the same uuid, update this aggregate in database instead of create it
-        const modelInDB = await this.repository.findOne(finderQueryStatement);
+        const modelInDB = await this.repository.findOne(finderQueryStatement(aggregate));
 
         if (modelInDB) throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate['id']['value']} already exist in database`);
 
