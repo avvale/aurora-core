@@ -1,3 +1,4 @@
+export * from './domain/cqrs';
 export * from './domain/decorators';
 export * from './domain/shared';
 export * from './domain/persistence';
