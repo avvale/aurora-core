@@ -3,6 +3,7 @@ export * from './domain/decorators';
 export * from './domain/shared';
 export * from './domain/persistence';
 export * from './domain/value-objects';
+export * from './infrastructure/cqrs';
 export * from './infrastructure/gcp';
 export * from './infrastructure/graphql';
 export * from './infrastructure/persistence';
