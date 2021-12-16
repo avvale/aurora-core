@@ -6,6 +6,7 @@ export * from './domain/value-objects';
 export * from './infrastructure/cqrs';
 export * from './infrastructure/gcp';
 export * from './infrastructure/graphql';
+export * from './infrastructure/i18n';
 export * from './infrastructure/persistence';
 export * from './domain/aurora.types';
 export * from './core.module';
