@@ -39,7 +39,7 @@ export class AddI18NConstraintService
         if (!lang && defineDefaultLanguage) lang = langs.find(lang => lang[FormatLangCode.ISO6392] === this.configService.get<string>('APP_LANG'));
 
         // error if lang is not defined
-        if (!lang && defineDefaultLanguage) throw new InternalServerErrorException('APP_LANG must be defined in iso6392 lang code format in .env file');
+        if (!lang && defineDefaultLanguage) throw new InternalServerErrorException('APP_LANG must be defined in iso6392 lang code format in .env file, not found contentLanguage: ', contentLanguage);
 
         return _.merge(
             {},
