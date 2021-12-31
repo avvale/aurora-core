@@ -27,6 +27,18 @@ export class AddI18NConstraintService
         } = {}
     ): Promise<QueryStatement>
     {
+        // if contentLanguage is *, return all languages records
+        if (contentLanguage === '*') return _.merge(
+            {},
+            {
+                include: [{
+                    association: i18NRelation,
+                    required   : true,
+                }]
+            },
+            constraint
+        );
+
         // get langs from cache manager, previous loaded in common module in onApplicationBootstrap hook
         const langs: {
             id: string;

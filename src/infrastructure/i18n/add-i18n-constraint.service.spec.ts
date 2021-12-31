@@ -107,5 +107,17 @@ describe('AddI18NConstraintService', () =>
                 ]
             });
         });
+
+        test('should return a QueryStatement without lang constraint', async () =>
+        {
+            expect(await service.main({}, 'i18NRelation', '*')).toEqual({
+                include: [
+                    {
+                        association: 'i18NRelation',
+                        required   : true,
+                    }
+                ]
+            });
+        });
     });
 });
