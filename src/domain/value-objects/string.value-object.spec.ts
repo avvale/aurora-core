@@ -91,10 +91,20 @@ describe('StringValueObject', () =>
             ).toThrowError('Value for MockStringValueObject is too large, has a maximum length of 5');
         });
 
-        test('MockStringValueObject should catch error: must be defined, BadRequestException: has a length', () =>
+        test('MockStringValueObject should catch error: must be defined, BadRequestException: has a length, pass more characters', () =>
         {
             expect(() =>
                 new MockStringValueObject('123456', {
+                    name  : 'MockStringValueObject',
+                    length: 5
+                })
+            ).toThrowError('Value for MockStringValueObject is not allowed, must be a length of 5');
+        });
+
+        test('MockStringValueObject should catch error: must be defined, BadRequestException: has a length, pass less characters', () =>
+        {
+            expect(() =>
+                new MockStringValueObject('1234', {
                     name  : 'MockStringValueObject',
                     length: 5
                 })
