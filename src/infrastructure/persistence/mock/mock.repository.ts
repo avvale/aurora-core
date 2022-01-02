@@ -2,14 +2,16 @@ import { Injectable, ConflictException, NotFoundException, BadRequestException }
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { Pagination } from '../../../domain/shared/pagination';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
+import { IRepository } from '../../../domain/persistence/repository';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
+import { CQMetadata, ObjectLiteral } from '../../../domain/aurora.types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
 
 @Injectable()
-export abstract class MockRepository<Aggregate extends AggregateBase>
+export abstract class MockRepository<Aggregate extends AggregateBase> implements IRepository<Aggregate>
 {
     public readonly repository: any;
     public readonly aggregateName: string;
@@ -27,10 +29,20 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
         }));
     }
 
-    async paginate(query: QueryStatement, constraint: QueryStatement): Promise<Pagination<Aggregate>>
+    async paginate(
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<Pagination<Aggregate>>
     {
-        const offset  = query.offset ? query.offset : 0;
-        const limit   = query.limit ? query.limit : this.collectionSource.length;
+        const offset  = queryStatement.offset ? queryStatement.offset : 0;
+        const limit   = queryStatement.limit ? queryStatement.limit : this.collectionSource.length;
 
         return {
             total: this.collectionSource.length,
@@ -39,7 +51,88 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
         };
     }
 
-    async create(aggregate: Aggregate): Promise<void>
+    async find(
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<Aggregate>
+    {
+        const aggregate = this.collectionSource.find(item => item.id.value === queryStatement.where.id);
+
+        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
+
+        return aggregate;
+    }
+
+    async findById(
+        id: UuidValueObject,
+        {
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<Aggregate>
+    {
+        const aggregate = this.collectionSource.find(author => author.id.value === id.value);
+
+        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
+
+        return aggregate;
+    }
+
+    async get(
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<Aggregate[]>
+    {
+        return this.collectionSource;
+    }
+
+    async count(
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<number>
+    {
+        return this.collectionSource.length;
+    }
+
+    // ******************
+    // ** side effects **
+    // ******************
+
+    async create(
+        aggregate: Aggregate,
+        {
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            // arguments to find object and check if object is duplicated
+            finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
+        }: {
+            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
+        } = {}
+    ): Promise<void>
     {
         if (this.collectionSource.find(item => item.id.value === aggregate.id.value)) throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate.id.value} already exist in database`);
 
@@ -49,35 +142,35 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
         this.collectionSource.push(aggregate);
     }
 
-    async insert(author: Aggregate[]): Promise<void>
+    async insert(
+        aggregates: Aggregate[],
+        {
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            insertOptions = undefined,
+        }: {
+            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            insertOptions?: ObjectLiteral;
+        } = {}
+    ): Promise<void>
     {
         /**/
     }
 
-    async find(queryStatement: QueryStatement): Promise<Aggregate>
-    {
-        const aggregate = this.collectionSource.find(item => item.id.value === queryStatement.where.id);
-
-        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
-
-        return aggregate;
-    }
-
-    async findById(id: UuidValueObject): Promise<Aggregate>
-    {
-        const aggregate = this.collectionSource.find(author => author.id.value === id.value);
-
-        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
-
-        return aggregate;
-    }
-
-    async get(queryStatement: QueryStatement): Promise<Aggregate[]>
-    {
-        return this.collectionSource;
-    }
-
-    async update(aggregate: Aggregate): Promise<void>
+    async update(
+        aggregate: Aggregate,
+        {
+            constraint = {},
+            cQMetadata = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            // arguments to find object to update, with i18n we use langId and id relationship with parent entity
+            findArguments = { id: aggregate['id']['value'] },
+        }: {
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            findArguments?: ObjectLiteral;
+        } = {}
+    ): Promise<void>
     {
         // check that aggregate exist
         await this.findById(aggregate.id);
@@ -89,7 +182,16 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
         });
     }
 
-    async deleteById(id: UuidValueObject): Promise<void>
+    async deleteById(
+        id: UuidValueObject,
+        {
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<void>
     {
         // check that aggregate exist
         await this.findById(id);
@@ -97,13 +199,18 @@ export abstract class MockRepository<Aggregate extends AggregateBase>
         this.collectionSource.filter(aggregate => aggregate.id.value !== id.value);
     }
 
-    async delete(queryStatement: QueryStatement): Promise<void>
+    async delete(
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {}
+    ): Promise<void>
     {
         if (!Array.isArray(queryStatement) || queryStatement.length === 0) throw new BadRequestException('To delete multiple records, you must define a query statement');
-    }
-
-    async count(queryStatement: QueryStatement): Promise<number>
-    {
-        return this.collectionSource.length;
     }
 }
