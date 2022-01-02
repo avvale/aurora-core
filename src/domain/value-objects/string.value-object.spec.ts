@@ -20,7 +20,8 @@ describe('StringValueObject', () =>
         test('MockStringValueObject should be defined with Hello World value', () =>
         {
             const mockStringValueObject = new MockStringValueObject('Hello World', {
-                name: 'MockStringValueObject'
+                name    : 'MockStringValueObject',
+                nullable: false,
             });
             expect(mockStringValueObject.value).toBe('Hello World');
         });
@@ -28,7 +29,8 @@ describe('StringValueObject', () =>
         test('MockStringValueObject should be defined with toString method, Hello World value', () =>
         {
             const mockStringValueObject = new MockStringValueObject('Hello World', {
-                name: 'MockStringValueObject'
+                name    : 'MockStringValueObject',
+                nullable: false,
             });
             expect(mockStringValueObject.toString()).toBe('Hello World');
         });
@@ -36,9 +38,19 @@ describe('StringValueObject', () =>
         test('MockStringValueObject should be null with empty value', () =>
         {
             const mockStringValueObject = new MockStringValueObject('', {
-                name: 'MockStringValueObject'
+                name    : 'MockStringValueObject',
+                nullable: true,
             });
             expect(mockStringValueObject.value).toBe(null);
+        });
+
+        test('MockStringValueObject should be undefined with undefined value', () =>
+        {
+            const mockStringValueObject = new MockStringValueObject(undefined, {
+                name    : 'MockStringValueObject',
+                nullable: true,
+            });
+            expect(mockStringValueObject.value).toBe(undefined);
         });
 
         test('MockStringValueObject should catch error: must be defined, BadRequestException: can not be null, when value is empty and nullable validation rule to false', () =>
@@ -46,7 +58,7 @@ describe('StringValueObject', () =>
             expect(() =>
                 new MockStringValueObject('', {
                     name    : 'MockStringValueObject',
-                    nullable: false
+                    nullable: false,
                 })
             ).toThrowError('Value for MockStringValueObject must be defined, can not be null');
         });
@@ -56,9 +68,20 @@ describe('StringValueObject', () =>
             expect(() =>
                 new MockStringValueObject(null, {
                     name    : 'MockStringValueObject',
-                    nullable: false
+                    nullable: false,
                 })
             ).toThrowError('Value for MockStringValueObject must be defined, can not be null');
+        });
+
+        test('MockStringValueObject should catch error: must be defined, BadRequestException: can be null', () =>
+        {
+            expect(
+                new MockStringValueObject(null, {
+                    name    : 'MockStringValueObject',
+                    nullable: true,
+                    length  : 5,
+                })
+            ).toBeInstanceOf(MockStringValueObject);
         });
 
         test('MockStringValueObject should catch error: must be defined, BadRequestException: can not be undefined', () =>
@@ -66,7 +89,8 @@ describe('StringValueObject', () =>
             expect(() =>
                 new MockStringValueObject(undefined, {
                     name       : 'MockStringValueObject',
-                    undefinable: false
+                    nullable   : false,
+                    undefinable: false,
                 })
             ).toThrowError('Value for MockStringValueObject must be defined, can not be undefined');
         });
@@ -76,6 +100,7 @@ describe('StringValueObject', () =>
             expect(() =>
                 new MockStringValueObject('1234', {
                     name     : 'MockStringValueObject',
+                    nullable : false,
                     minLength: 5
                 })
             ).toThrowError('Value for MockStringValueObject is too short, has a minimum length of 5');
@@ -86,6 +111,7 @@ describe('StringValueObject', () =>
             expect(() =>
                 new MockStringValueObject('123456', {
                     name     : 'MockStringValueObject',
+                    nullable : false,
                     maxLength: 5
                 })
             ).toThrowError('Value for MockStringValueObject is too large, has a maximum length of 5');
@@ -95,8 +121,9 @@ describe('StringValueObject', () =>
         {
             expect(() =>
                 new MockStringValueObject('123456', {
-                    name  : 'MockStringValueObject',
-                    length: 5
+                    name    : 'MockStringValueObject',
+                    nullable: false,
+                    length  : 5
                 })
             ).toThrowError('Value for MockStringValueObject is not allowed, must be a length of 5');
         });
@@ -105,8 +132,9 @@ describe('StringValueObject', () =>
         {
             expect(() =>
                 new MockStringValueObject('1234', {
-                    name  : 'MockStringValueObject',
-                    length: 5
+                    name    : 'MockStringValueObject',
+                    nullable: false,
+                    length  : 5,
                 })
             ).toThrowError('Value for MockStringValueObject is not allowed, must be a length of 5');
         });
