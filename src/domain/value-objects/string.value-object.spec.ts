@@ -53,6 +53,17 @@ describe('StringValueObject', () =>
             expect(mockStringValueObject.value).toBe(undefined);
         });
 
+        test('MockStringValueObject should be defined, with null value and length defined', () =>
+        {
+            expect(
+                new MockStringValueObject(null, {
+                    name    : 'MockStringValueObject',
+                    nullable: true,
+                    length  : 5,
+                })
+            ).toBeInstanceOf(MockStringValueObject);
+        });
+
         test('MockStringValueObject should catch error: must be defined, BadRequestException: can not be null, when value is empty and nullable validation rule to false', () =>
         {
             expect(() =>
@@ -71,17 +82,6 @@ describe('StringValueObject', () =>
                     nullable: false,
                 })
             ).toThrowError('Value for MockStringValueObject must be defined, can not be null');
-        });
-
-        test('MockStringValueObject should catch error: must be defined, BadRequestException: can be null', () =>
-        {
-            expect(
-                new MockStringValueObject(null, {
-                    name    : 'MockStringValueObject',
-                    nullable: true,
-                    length  : 5,
-                })
-            ).toBeInstanceOf(MockStringValueObject);
         });
 
         test('MockStringValueObject should catch error: must be defined, BadRequestException: can not be undefined', () =>
