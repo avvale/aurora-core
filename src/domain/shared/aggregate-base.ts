@@ -4,7 +4,7 @@ import { TimestampValueObject } from '../value-objects/timestamp.value-object';
 
 export interface AggregateBase
 {
-    id: UuidValueObject;
+    id?: UuidValueObject;
     createdAt?: TimestampValueObject;
     updatedAt?: TimestampValueObject;
     deletedAt?: TimestampValueObject;
