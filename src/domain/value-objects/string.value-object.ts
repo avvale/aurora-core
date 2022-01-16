@@ -5,7 +5,7 @@ export abstract class StringValueObject extends ValueObject<string>
 {
     set value(value: string)
     {
-        if (this.validationRules.nullable === false && value === '')                                throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be null`);
+        if (this.validationRules.nullable === false && value === '') throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be null`);
 
         if (value !== null && value !== undefined)
         {
