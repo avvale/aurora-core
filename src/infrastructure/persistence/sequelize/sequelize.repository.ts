@@ -29,7 +29,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Pagination<Aggregate>>
     {
         // manage hook count paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -38,7 +38,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // get count total records from sql service library
         const total = await this.repository.count(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookCountResponse.queryStatement, hookCountResponse.cQMetadata)
+            this.criteria.implements(hookCountResponse.queryStatement, hookCountResponse.cQMetadata),
         );
 
         // manage hook compose paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -47,13 +47,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // get records
         const { count, rows } = await this.repository.findAndCountAll(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookComposeResponse.queryStatement, hookComposeResponse.cQMetadata)
+            this.criteria.implements(hookComposeResponse.queryStatement, hookComposeResponse.cQMetadata),
         );
 
         return {
             total,
             count,
-            rows: <Aggregate[]>this.mapper.mapModelsToAggregates(rows, cQMetadata) // map values to create value objects
+            rows: <Aggregate[]>this.mapper.mapModelsToAggregates(rows, cQMetadata), // map values to create value objects
         };
     }
 
@@ -72,7 +72,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -80,7 +80,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const model = await this.repository.findOne(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata)
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
         );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
@@ -100,22 +100,22 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementFindByIdHook(
             _.merge({
                 where: {
-                    id: id.value
-                }
-            }, constraint), cQMetadata
+                    id: id.value,
+                },
+            }, constraint), cQMetadata,
         );
 
         // value is already mapped
         const model = await this.repository.findOne(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata)
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
         );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} with id: ${id.value}, not found`);
@@ -136,7 +136,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate[]>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -144,7 +144,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const models = await this.repository.findAll(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata)
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
         );
 
         // map values to create value objects
@@ -164,7 +164,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<number>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -172,7 +172,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const nRecords = await this.repository.count(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata)
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
         );
 
         return nRecords;
@@ -195,8 +195,8 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         }: {
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
-        } = {}
-    )
+        } = {},
+    ): Promise<void>
     {
         // check if exist object in database, if allow save aggregate with the same uuid, update this aggregate in database instead of create it
         const modelInDB = await this.repository.findOne(finderQueryStatement(aggregate));
@@ -226,7 +226,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         }: {
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             insertOptions?: ObjectLiteral;
-        } = {}
+        } = {},
     ): Promise<void>
     {
         await this.repository.bulkCreate(aggregates.map(item => dataFactory(item)), insertOptions);
@@ -250,7 +250,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             findArguments?: ObjectLiteral;
-        } = {}
+        } = {},
     ): Promise<void>
     {
         // check that model exist
@@ -259,9 +259,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             this.criteria.implements(
                 _.merge(
                     { where: findArguments },
-                    constraint
-                ), cQMetadata
-            )
+                    constraint,
+                ), cQMetadata,
+            ),
         );
 
         if (!modelInDB) throw new NotFoundException(`${this.aggregateName} not found`);
@@ -290,7 +290,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<void>
     {
         // check that aggregate exist
@@ -300,11 +300,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
                 _.merge(
                     {
                         where: {
-                            id: id.value
-                        }
-                    }, constraint
-                ), cQMetadata
-            )
+                            id: id.value,
+                        },
+                    }, constraint,
+                ), cQMetadata,
+            ),
         );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
@@ -321,7 +321,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<void>
     {
         if (!queryStatement || !queryStatement.where) throw new BadRequestException('To delete multiple records, you must define a where statement');
@@ -329,7 +329,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // check that aggregate exist
         await this.repository.destroy(
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata)
+            this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata),
         );
     }
 }
