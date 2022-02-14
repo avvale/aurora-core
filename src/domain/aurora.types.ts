@@ -2,15 +2,15 @@ import { QueryStatement } from './persistence/sql-statement/sql-statement';
 
 export interface CQMetadata
 {
-    timezone?: string,
+    timezone?: string;
 }
 
 export interface DataValueObject
 {
-    haveToEncrypt?: boolean,
-    currentTimestamp?: boolean,
-    addTimezone?: string,
-    removeTimezone?: string,
+    haveToEncrypt?: boolean;
+    currentTimestamp?: boolean;
+    addTimezone?: string;
+    removeTimezone?: string;
 }
 
 export enum FormatLangCode
@@ -23,8 +23,8 @@ export enum FormatLangCode
 
 export interface HookResponse
 {
-    queryStatement?: QueryStatement,
-    cQMetadata?: CQMetadata
+    queryStatement?: QueryStatement;
+    cQMetadata?: CQMetadata;
 }
 
 export interface Jwt
@@ -49,24 +49,24 @@ export interface ObjectLiteral
 
 export interface SeederBoundedContext
 {
-    id: string,
-    name: string,
-    root: string,
-    sort: number,
-    isActive: boolean,
+    id: string;
+    name: string;
+    root: string;
+    sort: number;
+    isActive: boolean;
 }
 
 export interface SeederPermission
 {
-    id: string,
-    name: string,
-    boundedContextId: string,
-    roleIds?: string[],
+    id: string;
+    name: string;
+    boundedContextId: string;
+    roleIds?: string[];
 }
 
 export interface ValidationRules
 {
-    name?: string,
+    name?: string;
     nullable?: boolean;
     undefinable?: boolean;
     length?:number;
