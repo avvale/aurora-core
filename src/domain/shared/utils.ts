@@ -60,6 +60,21 @@ export class Utils
                 : obj;
     }
 
+    public static deepMapKeysOperators(obj, fn): ObjectLiteral
+    {
+        return Array.isArray(obj) ?
+            obj.map(val => Utils.deepMapKeysOperators(val, fn)) :
+            typeof obj === 'object' && obj.constructor.name !== 'Fn' ?
+                Object.keys(obj).reduce((acc, current) =>
+                {
+                    const key = fn(current);
+                    const val = obj[current];
+                    acc[key] = val !== null && typeof val === 'object' ? Utils.deepMapKeysOperators(val, fn) : val;
+                    return acc;
+                }, {})
+                : obj;
+    }
+
     public static deepMapValues(obj, fn: Function): ObjectLiteral
     {
         if (Array.isArray(obj))

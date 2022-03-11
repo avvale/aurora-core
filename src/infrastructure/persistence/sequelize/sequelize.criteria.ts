@@ -38,7 +38,7 @@ export class SequelizeCriteria implements ICriteria
         }
 
         // replace key string by sequelize symbols
-        return Utils.deepMapKeys(
+        return Utils.deepMapKeysOperators(
             queryStatement,
             key => key.startsWith('[') &&
             key.endsWith(']') &&
