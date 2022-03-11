@@ -64,7 +64,9 @@ export class Utils
     {
         return Array.isArray(obj) ?
             obj.map(val => Utils.deepMapKeysOperators(val, fn)) :
-            typeof obj === 'object' && obj.constructor.name !== 'Fn' ?
+            typeof obj === 'object' &&
+            obj.constructor.name !== 'Fn' &&    // avoid manage Sequelize.fn
+            obj.constructor.name !== 'Cast' ?   // avoid manage Sequelize.cast
                 Object.keys(obj).reduce((acc, current) =>
                 {
                     const key = fn(current);
