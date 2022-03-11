@@ -9,6 +9,7 @@ import { ICriteria } from '../../../domain/persistence/criteria';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata } from '../../../domain/aurora.types';
 import { Utils } from '../../../domain/shared/utils';
+import { Operator } from '../../../domain/persistence/sql-statement/operator';
 
 export class SequelizeCriteria implements ICriteria
 {
@@ -28,7 +29,22 @@ export class SequelizeCriteria implements ICriteria
             });
         }
 
+        // get all keys from Operator enum
+        const availableOperators = [];
+        for (const operator in Operator)
+        {
+            if (!isNaN(Number(operator))) break;
+            availableOperators.push(operator);
+        }
+
         // replace key string by sequelize symbols
-        return Utils.deepMapKeys(queryStatement, key => key.startsWith('[') && key.endsWith(']') ? Op[key.slice(1,-1)] : key);
+        return Utils.deepMapKeys(
+            queryStatement,
+            key => key.startsWith('[') &&
+            key.endsWith(']') &&
+            availableOperators.includes(key.slice(1,-1))
+                ? Op[key.slice(1,-1)]
+                : key,
+        );
     }
 }
