@@ -5,8 +5,6 @@ export abstract class NumberValueObject extends ValueObject<number>
 {
     set value(value: number)
     {
-        // we make sure to get a numeric data, if we pass a string representing a number we caste it
-        value = new Number(value).valueOf();
         if (value === <number><unknown>'') value = null;
         if (value?.toString().length > this.validationRules.maxLength)
             throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${this.validationRules.maxLength}`);

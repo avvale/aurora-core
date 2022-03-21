@@ -20,7 +20,7 @@ describe('NumberValueObject', () =>
         test('MockNumberValueObject should be defined with 10 value', () =>
         {
             const mockNumberValueObject = new MockNumberValueObject(10, {
-                name: 'MockNumberValueObject'
+                name: 'MockNumberValueObject',
             });
             expect(mockNumberValueObject.value).toBe(10);
         });
@@ -28,7 +28,7 @@ describe('NumberValueObject', () =>
         test('MockNumberValueObject should be defined with toString method, 10 value', () =>
         {
             const mockNumberValueObject = new MockNumberValueObject(10, {
-                name: 'MockNumberValueObject'
+                name: 'MockNumberValueObject',
             });
             expect(mockNumberValueObject.toString()).toBe('10');
         });
@@ -38,8 +38,8 @@ describe('NumberValueObject', () =>
             expect(() =>
                 new MockNumberValueObject(null, {
                     name    : 'MockNumberValueObject',
-                    nullable: false
-                })
+                    nullable: false,
+                }),
             ).toThrowError('Value for MockNumberValueObject must be defined, can not be null');
         });
 
@@ -48,8 +48,8 @@ describe('NumberValueObject', () =>
             expect(() =>
                 new MockNumberValueObject(undefined, {
                     name       : 'MockNumberValueObject',
-                    undefinable: false
-                })
+                    undefinable: false,
+                }),
             ).toThrowError('Value for MockNumberValueObject must be defined, can not be undefined');
         });
 
@@ -58,8 +58,8 @@ describe('NumberValueObject', () =>
             expect(() =>
                 new MockNumberValueObject(<number><unknown>'', {
                     name    : 'MockNumberValueObject',
-                    nullable: false
-                })
+                    nullable: false,
+                }),
             ).toThrowError('Value for MockNumberValueObject must be defined, can not be null');
         });
 
@@ -68,8 +68,8 @@ describe('NumberValueObject', () =>
             expect(() =>
                 new MockNumberValueObject(123456, {
                     name     : 'MockNumberValueObject',
-                    maxLength: 5
-                })
+                    maxLength: 5,
+                }),
             ).toThrowError('Value for MockNumberValueObject is too large, has a maximum length of 5');
         });
 
@@ -78,8 +78,8 @@ describe('NumberValueObject', () =>
             expect(() =>
                 new MockNumberValueObject(-1, {
                     name    : 'MockNumberValueObject',
-                    unsigned: true
-                })
+                    unsigned: true,
+                }),
             ).toThrowError('The numerical value for MockNumberValueObject must have a positive sign, this field does not accept negative values');
         });
     });
