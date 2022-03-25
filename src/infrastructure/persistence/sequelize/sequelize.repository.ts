@@ -142,10 +142,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementGetHook(_.merge(queryStatement, constraint), cQMetadata);
 
-        const models = await this.repository.findAll(
-            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-        );
+        const models = queryStatement.rawSQL ?
+            await this.repository.query(queryStatement.rawSQL, { type: queryStatement.metadata.type })
+            :
+            await this.repository.findAll(
+                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            );
 
         // map values to create value objects
         return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
