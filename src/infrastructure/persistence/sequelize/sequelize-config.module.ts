@@ -26,11 +26,11 @@ import { Dialect } from 'sequelize/types';
                     autoLoadModels: true,
                     models        : [],
                 };
-            }
-        })
+            },
+        }),
     ],
     exports: [
-        SequelizeModule
-    ]
+        SequelizeModule,
+    ],
 })
 export class SequelizeConfigModule {}

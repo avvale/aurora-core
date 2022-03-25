@@ -143,7 +143,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementGetHook(_.merge(queryStatement, constraint), cQMetadata);
 
         const models = queryStatement.rawSQL ?
-            await this.repository.query(queryStatement.rawSQL, { type: queryStatement.metadata.type })
+            await this.repository.sequelize.query(queryStatement.rawSQL, { type: queryStatement.metadata.type })
             :
             await this.repository.findAll(
                 // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
