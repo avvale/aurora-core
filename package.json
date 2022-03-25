@@ -1,6 +1,6 @@
 {
   "name": "aurora-ts-core",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "description": "Aurora npm package starter",
   "author": "Jose Carlos Rodriguez Palacín <carlos.rodriguez.palacin@gmail.com>",
   "license": "MIT",
@@ -23,17 +23,15 @@
     "cache-manager": "^3.6.0",
     "clean-deep": "^3.4.0",
     "dayjs": "^1.10.7",
-    "mysql2": "^2.3.0",
     "sequelize": "^6.6.5",
     "sequelize-typescript": "^2.1.0",
-    "sqlite3": "^5.0.2",
     "uuid-validate": "0.0.3"
   },
   "peerDependencies": {
     "@nestjs/common": "^8.0.0",
-    "@nestjs/config": "^1.2.0",
+    "@nestjs/config": "^2.0.0",
     "@nestjs/core": "^8.0.0",
-    "@nestjs/graphql": "^10.0.2",
+    "@nestjs/graphql": "^10.0.8",
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/swagger": "^5.2.0",
     "@nestjs/testing": "8.0.0"
