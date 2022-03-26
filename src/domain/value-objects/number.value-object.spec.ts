@@ -82,5 +82,14 @@ describe('NumberValueObject', () =>
                 }),
             ).toThrowError('The numerical value for MockNumberValueObject must have a positive sign, this field does not accept negative values');
         });
+
+        test('MockNumberValueObject should catch error: must be defined, BadRequestException: must have a positive sign', () =>
+        {
+            expect(() =>
+                new MockNumberValueObject(<number><unknown>'abc', {
+                    name: 'MockNumberValueObject',
+                }),
+            ).toThrowError('Value for MockNumberValueObject has to be a number value');
+        });
     });
 });

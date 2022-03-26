@@ -5,6 +5,12 @@ export abstract class NumberValueObject extends ValueObject<number>
 {
     set value(value: number)
     {
+        if (
+            value !== undefined &&
+            value !== null &&
+            isNaN(value)
+        ) throw new BadRequestException(`Value for ${this.validationRules.name} has to be a number value`);
+
         if (value === <number><unknown>'') value = null;
         if (value?.toString().length > this.validationRules.maxLength)
             throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${this.validationRules.maxLength}`);
