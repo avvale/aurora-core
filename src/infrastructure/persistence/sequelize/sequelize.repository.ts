@@ -1,4 +1,5 @@
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
@@ -78,10 +79,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementFindHook(_.merge(queryStatement, constraint), cQMetadata);
 
-        const model = await this.repository.findOne(
-            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-        );
+        const model = queryStatement.rawSQL ?
+            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
+            :
+            await this.repository.findOne(
+                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
 
@@ -143,7 +147,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementGetHook(_.merge(queryStatement, constraint), cQMetadata);
 
         const models = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(queryStatement.rawSQL, { type: queryStatement.metadata.type })
+            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
             :
             await this.repository.findAll(
                 // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
@@ -173,10 +177,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementCountHook(_.merge(queryStatement, constraint), cQMetadata);
 
-        const nRecords = await this.repository.count(
-            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-        );
+        const nRecords = queryStatement.rawSQL ?
+            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
+            :
+            await this.repository.count(
+                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            );
 
         return nRecords;
     }

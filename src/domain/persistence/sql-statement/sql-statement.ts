@@ -16,11 +16,6 @@ export class QueryStatement
     rawSQL?: string;
 
     /**
-     * specific information required for a ORM. example: {metadata: { type: QueryTypes.SELECT }}
-     */
-    metadata?: any;
-
-    /**
      * Attribute has to be matched for rows to be selected for the given action.
      */
     where?: any;
