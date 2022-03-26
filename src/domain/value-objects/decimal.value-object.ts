@@ -9,8 +9,8 @@ export abstract class DecimalValueObject extends NumberValueObject
 
         // get integers and decimals length
         const decimalCounter = this.decimalCount(value);
-        const integersLimit = this.validationRules.decimalOptions[0] - this.validationRules.decimalOptions[1];
-        const decimalsLimit = this.validationRules.decimalOptions[1];
+        const integersLimit = this.validationRules.decimals[0] - this.validationRules.decimals[1];
+        const decimalsLimit = this.validationRules.decimals[1];
 
         if (decimalCounter.integers > integersLimit)
             throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${integersLimit} integers in ${value} number`);
