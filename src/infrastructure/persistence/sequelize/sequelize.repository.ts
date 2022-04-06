@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { QueryTypes, Transaction } from 'sequelize';
+import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
