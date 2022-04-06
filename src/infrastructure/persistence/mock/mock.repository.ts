@@ -38,7 +38,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Pagination<Aggregate>>
     {
         const offset  = queryStatement.offset ? queryStatement.offset : 0;
@@ -60,7 +60,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate>
     {
         const aggregate = this.collectionSource.find(item => item.id.value === queryStatement.where.id);
@@ -78,7 +78,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate>
     {
         const aggregate = this.collectionSource.find(author => author.id.value === id.value);
@@ -97,7 +97,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<Aggregate[]>
     {
         return this.collectionSource;
@@ -112,7 +112,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+        } = {},
     ): Promise<number>
     {
         return this.collectionSource.length;
@@ -128,13 +128,16 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
+            createOptions = undefined,
         }: {
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
-        } = {}
+            createOptions?: ObjectLiteral;
+        } = {},
     ): Promise<void>
     {
-        if (this.collectionSource.find(item => item.id.value === aggregate.id.value)) throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate.id.value} already exist in database`);
+        if (this.collectionSource.find(item => item.id.value === aggregate.id.value))
+            throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate.id.value} already exist in database`);
 
         // create deletedAt null
         aggregate.deletedAt = this.deletedAtInstance;
@@ -150,7 +153,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         }: {
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             insertOptions?: ObjectLiteral;
-        } = {}
+        } = {},
     ): Promise<void>
     {
         /**/
@@ -164,12 +167,14 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
+            updateOptions = undefined,
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             findArguments?: ObjectLiteral;
-        } = {}
+            updateOptions?: ObjectLiteral;
+        } = {},
     ): Promise<void>
     {
         // check that aggregate exist
@@ -187,10 +192,12 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         {
             constraint = {},
             cQMetadata = undefined,
+            deleteOptions = undefined,
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+            deleteOptions?: ObjectLiteral;
+        } = {},
     ): Promise<void>
     {
         // check that aggregate exist
@@ -204,11 +211,13 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement = {},
             constraint = {},
             cQMetadata = undefined,
+            deleteOptions = undefined,
         }: {
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        } = {}
+            deleteOptions?: ObjectLiteral;
+        } = {},
     ): Promise<void>
     {
         if (!Array.isArray(queryStatement) || queryStatement.length === 0) throw new BadRequestException('To delete multiple records, you must define a query statement');

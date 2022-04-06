@@ -1,5 +1,5 @@
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { QueryTypes } from 'sequelize';
+import { QueryTypes, Transaction } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
@@ -202,9 +202,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
+            createOptions = undefined,
         }: {
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
+            createOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -215,7 +217,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         try
         {
-            const model = await this.repository.create(dataFactory(aggregate));
+            const model = await this.repository.create(dataFactory(aggregate), createOptions);
 
             this.createdAggregateHook(aggregate, model);
         }
@@ -255,11 +257,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
+            updateOptions = undefined,
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             findArguments?: ObjectLiteral;
+            updateOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -284,7 +288,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             emptyArrays : false,
         });
 
-        const model = await modelInDB.update(objectLiteral);
+        const model = await modelInDB.update(objectLiteral, updateOptions);
 
         this.updatedAggregateHook(aggregate, model);
     }
@@ -297,9 +301,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         {
             constraint = {},
             cQMetadata = undefined,
+            deleteOptions = undefined,
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            deleteOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -319,7 +325,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
 
-        await model.destroy();
+        await model.destroy(deleteOptions);
     }
 
     async delete(
@@ -327,10 +333,12 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement = {},
             constraint = {},
             cQMetadata = undefined,
+            deleteOptions = undefined,
         }: {
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            deleteOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -340,6 +348,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         await this.repository.destroy(
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata),
+            deleteOptions,
         );
     }
 }
