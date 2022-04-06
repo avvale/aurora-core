@@ -199,14 +199,14 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async create(
         aggregate: Aggregate,
         {
+            createOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
-            createOptions = undefined,
         }: {
+            createOptions?: ObjectLiteral;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
-            createOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -233,11 +233,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async insert(
         aggregates: Aggregate[],
         {
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             insertOptions = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
         }: {
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             insertOptions?: ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -252,18 +252,18 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async update(
         aggregate: Aggregate,
         {
+            updateOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
-            updateOptions = undefined,
         }: {
+            updateOptions?: ObjectLiteral;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             findArguments?: ObjectLiteral;
-            updateOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -299,13 +299,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async deleteById(
         id: UuidValueObject,
         {
+            deleteOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
-            deleteOptions = undefined,
         }: {
+            deleteOptions?: ObjectLiteral;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            deleteOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {
@@ -330,15 +330,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
     async delete(
         {
+            deleteOptions = undefined,
             queryStatement = {},
             constraint = {},
             cQMetadata = undefined,
-            deleteOptions = undefined,
         }: {
+            deleteOptions?: ObjectLiteral;
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            deleteOptions?: ObjectLiteral;
         } = {},
     ): Promise<void>
     {

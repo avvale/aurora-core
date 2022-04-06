@@ -3,6 +3,7 @@ import { QueryStatement } from './persistence/sql-statement/sql-statement';
 export interface CQMetadata
 {
     timezone?: string;
+    repositoryOptions?: ObjectLiteral;
 }
 
 export interface DataValueObject
