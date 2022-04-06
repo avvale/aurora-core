@@ -60,6 +60,7 @@ export interface IRepository<Aggregate>
     create(
         item: Aggregate,
         options?: {
+            createOptions?: ObjectLiteral;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
             finderQueryStatement: (aggregate: Aggregate) => QueryStatement;
         }
@@ -78,6 +79,7 @@ export interface IRepository<Aggregate>
     update(
         item: Aggregate,
         options?: {
+            updateOptions?: ObjectLiteral;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
@@ -89,6 +91,7 @@ export interface IRepository<Aggregate>
     deleteById(
         id: ValueObject<string>,
         options?: {
+            deleteOptions?: ObjectLiteral;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         }
@@ -97,6 +100,7 @@ export interface IRepository<Aggregate>
     // delete record
     delete(
         options?: {
+            deleteOptions?: ObjectLiteral;
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
