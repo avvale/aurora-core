@@ -26,6 +26,11 @@ export class Utils
         return dayjs().format('YYYY-MM-DD H:mm:ss');
     }
 
+    public static nowDate(): string
+    {
+        return dayjs().format('YYYY-MM-DD');
+    }
+
     public static sha1(data: string): string
     {
         const generator = crypto.createHash('sha1');

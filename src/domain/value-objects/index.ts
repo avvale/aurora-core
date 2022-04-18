@@ -1,5 +1,6 @@
 export * from './boolean.value-object';
 export * from './coordinate.value-object';
+export * from './date.value-object';
 export * from './decimal.value-object';
 export * from './enum.value-object';
 export * from './int.value-object';

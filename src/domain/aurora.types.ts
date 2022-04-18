@@ -10,6 +10,7 @@ export interface DataValueObject
 {
     haveToEncrypt?: boolean;
     currentTimestamp?: boolean;
+    currentDate?: boolean;
     addTimezone?: string;
     removeTimezone?: string;
 }
