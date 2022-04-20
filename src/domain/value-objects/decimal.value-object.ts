@@ -22,7 +22,7 @@ export abstract class DecimalValueObject extends NumberValueObject
 
     get value(): number
     {
-        return super.value;
+        return typeof super.value === 'number' ? super.value : Number.parseFloat(super.value);
     }
 
     toString(): string
