@@ -241,6 +241,18 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         } = {},
     ): Promise<void>
     {
+        /********
+         * user insertOptions to add properties like updateOnDuplicate
+         *  {
+         *      repositoryOptions: {
+         *          updateOnDuplicate: [
+         *              'name', // fields than can be updated
+         *              ...
+         *          ],
+         *      },
+         *  }
+         */
+
         await this.repository.bulkCreate(aggregates.map(item => dataFactory(item)), insertOptions);
 
         this.insertedAggregateHook(aggregates);
@@ -347,8 +359,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // check that aggregate exist
         await this.repository.destroy(
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata),
-            deleteOptions,
+            { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...deleteOptions },
         );
     }
 }
