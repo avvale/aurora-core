@@ -1,4 +1,4 @@
-import { ObjectLiteral } from '../aurora.types';
+import { LiteralObject } from '@nestjs/common';
 import { UuidValueObject } from '../value-objects/uuid.value-object';
 import { TimestampValueObject } from '../value-objects/timestamp.value-object';
 
@@ -9,5 +9,5 @@ export interface AggregateBase
     updatedAt?: TimestampValueObject;
     deletedAt?: TimestampValueObject;
 
-    toDTO(): ObjectLiteral;
+    toDTO(): LiteralObject;
 }

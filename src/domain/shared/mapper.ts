@@ -1,13 +1,14 @@
+import { LiteralObject } from '@nestjs/common';
 import { AggregateBase } from './aggregate-base';
-import { ObjectLiteral, CQMetadata } from '../aurora.types';
+import { CQMetadata } from '../aurora.types';
 
 export interface IMapper
 {
-    mapModelToAggregate(object: ObjectLiteral, cQMetadata?: CQMetadata): AggregateBase;
+    mapModelToAggregate(object: LiteralObject, cQMetadata?: CQMetadata): AggregateBase;
 
-    mapModelsToAggregates(objects: ObjectLiteral[], cQMetadata?: CQMetadata): AggregateBase[];
+    mapModelsToAggregates(objects: LiteralObject[], cQMetadata?: CQMetadata): AggregateBase[];
 
-    mapAggregateToResponse(aggregate: AggregateBase): ObjectLiteral;
+    mapAggregateToResponse(aggregate: AggregateBase): LiteralObject;
 
-    mapAggregatesToResponses(aggregates: AggregateBase[]): ObjectLiteral[];
+    mapAggregatesToResponses(aggregates: AggregateBase[]): LiteralObject[];
 }

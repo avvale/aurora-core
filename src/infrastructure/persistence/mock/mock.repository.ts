@@ -1,11 +1,11 @@
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, ConflictException, NotFoundException, BadRequestException, LiteralObject } from '@nestjs/common';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { Pagination } from '../../../domain/shared/pagination';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { IRepository } from '../../../domain/persistence/repository';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
-import { CQMetadata, ObjectLiteral } from '../../../domain/aurora.types';
+import { CQMetadata } from '../../../domain/aurora.types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
@@ -47,7 +47,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         return {
             total: this.collectionSource.length,
             count: this.collectionSource.length,
-            rows : this.collectionSource.slice(offset, limit)
+            rows : this.collectionSource.slice(offset, limit),
         };
     }
 
@@ -130,9 +130,9 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
             createOptions = undefined,
         }: {
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
-            createOptions?: ObjectLiteral;
+            createOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -151,8 +151,8 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             insertOptions = undefined,
         }: {
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
-            insertOptions?: ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            insertOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -171,9 +171,9 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
-            findArguments?: ObjectLiteral;
-            updateOptions?: ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
+            updateOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -196,7 +196,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -216,7 +216,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {

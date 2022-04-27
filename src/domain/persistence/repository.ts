@@ -1,6 +1,7 @@
+import { LiteralObject } from '@nestjs/common';
 import { QueryStatement } from './sql-statement/sql-statement';
 import { ValueObject } from '../value-objects/value-object';
-import { CQMetadata, ObjectLiteral } from '../aurora.types';
+import { CQMetadata } from '../aurora.types';
 import { Pagination } from '../shared/pagination';
 
 export interface IRepository<Aggregate>
@@ -60,8 +61,8 @@ export interface IRepository<Aggregate>
     create(
         item: Aggregate,
         options?: {
-            createOptions?: ObjectLiteral;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            createOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement: (aggregate: Aggregate) => QueryStatement;
         }
     ): Promise<void>;
@@ -70,8 +71,8 @@ export interface IRepository<Aggregate>
     insert(
         items: Aggregate[],
         options?: {
-            insertOptions?: ObjectLiteral;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            insertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
         }
     ): Promise<void>;
 
@@ -79,11 +80,11 @@ export interface IRepository<Aggregate>
     update(
         item: Aggregate,
         options?: {
-            updateOptions?: ObjectLiteral;
+            updateOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
-            findArguments?: ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
         }
     ): Promise<void>;
 
@@ -91,7 +92,7 @@ export interface IRepository<Aggregate>
     deleteById(
         id: ValueObject<string>,
         options?: {
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         }
@@ -100,7 +101,7 @@ export interface IRepository<Aggregate>
     // delete record
     delete(
         options?: {
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;

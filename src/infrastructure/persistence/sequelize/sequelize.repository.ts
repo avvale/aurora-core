@@ -1,8 +1,8 @@
-import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConflictException, NotFoundException, BadRequestException, LiteralObject } from '@nestjs/common';
 import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
-import { CQMetadata, HookResponse, ObjectLiteral } from '../../../domain/aurora.types';
+import { CQMetadata, HookResponse } from '../../../domain/aurora.types';
 import { IRepository } from '../../../domain/persistence/repository';
 import { ICriteria } from '../../../domain/persistence/criteria';
 import { IMapper } from '../../../domain/shared/mapper';
@@ -204,8 +204,8 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
         }: {
-            createOptions?: ObjectLiteral;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            createOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
         } = {},
     ): Promise<void>
@@ -236,8 +236,8 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             insertOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
         }: {
-            insertOptions?: ObjectLiteral;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
+            insertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -271,11 +271,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
         }: {
-            updateOptions?: ObjectLiteral;
+            updateOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => ObjectLiteral;
-            findArguments?: ObjectLiteral;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -293,14 +293,14 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (!modelInDB) throw new NotFoundException(`${this.aggregateName} not found`);
 
         // clean undefined fields, to avoid update undefined fields
-        const objectLiteral = cleanDeep(dataFactory(aggregate), {
+        const LiteralObject = cleanDeep(dataFactory(aggregate), {
             nullValues  : false,
             emptyStrings: false,
             emptyObjects: false,
             emptyArrays : false,
         });
 
-        const model = await modelInDB.update(objectLiteral, updateOptions);
+        const model = await modelInDB.update(LiteralObject, updateOptions);
 
         this.updatedAggregateHook(aggregate, model);
     }
@@ -315,7 +315,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             constraint = {},
             cQMetadata = undefined,
         }: {
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
@@ -347,7 +347,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             constraint = {},
             cQMetadata = undefined,
         }: {
-            deleteOptions?: ObjectLiteral;
+            deleteOptions?: LiteralObject;
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;

@@ -1,3 +1,4 @@
+import { LiteralObject } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
@@ -7,7 +8,6 @@ import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import * as advancedFormat from 'dayjs/plugin/advancedFormat';
 import * as dayjs from 'dayjs';
-import { ObjectLiteral } from '../aurora.types';
 declare const Buffer: any;
 
 dayjs.extend(utc);
@@ -50,7 +50,7 @@ export class Utils
     }
 
     // map deeply object keys
-    public static deepMapKeys(obj, fn): ObjectLiteral
+    public static deepMapKeys(obj, fn): LiteralObject
     {
         return Array.isArray(obj)
             ? obj.map(val => Utils.deepMapKeys(val, fn))
@@ -65,7 +65,7 @@ export class Utils
                 : obj;
     }
 
-    public static deepMapKeysOperators(obj, fn): ObjectLiteral
+    public static deepMapKeysOperators(obj, fn): LiteralObject
     {
         return Array.isArray(obj) ?
             obj.map(val => Utils.deepMapKeysOperators(val, fn)) :
@@ -82,7 +82,7 @@ export class Utils
                 : obj;
     }
 
-    public static deepMapValues(obj, fn: Function): ObjectLiteral
+    public static deepMapValues(obj, fn: Function): LiteralObject
     {
         if (Array.isArray(obj))
         {

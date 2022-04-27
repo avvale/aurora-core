@@ -1,9 +1,10 @@
+import { LiteralObject } from '@nestjs/common';
 import { QueryStatement } from './persistence/sql-statement/sql-statement';
 
 export interface CQMetadata
 {
     timezone?: string;
-    repositoryOptions?: ObjectLiteral;
+    repositoryOptions?: LiteralObject;
 }
 
 export interface DataValueObject
@@ -42,11 +43,6 @@ export interface Jwt
 export interface MapperOptions
 {
     eagerLoading: boolean;
-}
-
-export interface ObjectLiteral
-{
-    [key: string]: any;
 }
 
 export interface SeederBoundedContext
