@@ -1,4 +1,4 @@
-import { users } from '.';
+import { users } from './iam-user.seed';
 
 export const accounts = [
     {
