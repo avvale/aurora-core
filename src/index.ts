@@ -1,3 +1,5 @@
+export * from './application/handlers';
+export * from './application/services';
 export * from './core.module';
 export * from './domain/aurora.types';
 export * from './domain/cqrs';
@@ -10,4 +12,3 @@ export * from './infrastructure/gcp';
 export * from './infrastructure/graphql';
 export * from './infrastructure/i18n';
 export * from './infrastructure/persistence';
-export * from './infrastructure/services';

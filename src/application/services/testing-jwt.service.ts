@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { accessTokens, accounts, Jwt, Utils } from '../..';
+import { Jwt } from '../../domain/aurora.types';
+import { accounts } from '../../domain/persistence/seeds/iam-account.seed';
+import { accessTokens } from '../../domain/persistence/seeds/o-auth-access-token.seed';
+import { Utils } from '../../domain/shared/utils';
 
 @Injectable()
 export class TestingJwtService

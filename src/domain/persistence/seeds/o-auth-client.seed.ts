@@ -1,5 +1,5 @@
 // ignored file
-import { applications } from '.';
+import { applications } from './o-auth-application.seed';
 
 export const clients = [
     {
