@@ -1,5 +1,3 @@
-export * from './application/handlers';
-export * from './application/services';
 export * from './core.module';
 export * from './domain/aurora.types';
 export * from './domain/cqrs';
