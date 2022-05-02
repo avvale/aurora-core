@@ -1,9 +1,23 @@
+/* eslint-disable max-len */
 import { BadRequestException } from '@nestjs/common';
 import { ValueObject } from './value-object';
 
 export abstract class StringValueObject extends ValueObject<string>
 {
     set value(value: string)
+    {
+        this.validateStringRules(value);
+
+        super.value = value;
+    }
+
+    get value(): string
+    {
+        if (this._value === '') return null;
+        return super.value;
+    }
+
+    validateStringRules(value: string): void
     {
         if (this.validationRules.nullable === false && value === '') throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be null`);
 
@@ -13,14 +27,6 @@ export abstract class StringValueObject extends ValueObject<string>
             if (!!this.validationRules?.maxLength && value?.length > this.validationRules.maxLength)    throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${this.validationRules.maxLength}`);
             if (!!this.validationRules?.length && value?.length !== this.validationRules.length)        throw new BadRequestException(`Value for ${this.validationRules.name} is not allowed, must be a length of ${this.validationRules.length}`);
         }
-
-        super.value = value;
-    }
-
-    get value(): string
-    {
-        if (this._value === '') return null;
-        return super.value;
     }
 
     toString(): string

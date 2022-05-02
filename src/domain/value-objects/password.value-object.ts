@@ -5,6 +5,7 @@ export abstract class PasswordValueObject extends StringValueObject
 {
     set value(value: string)
     {
+        this.validateStringRules(value);
         super.value = value && this.data.haveToEncrypt ? Utils.hash(value) : value;
     }
 
