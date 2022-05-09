@@ -38,6 +38,7 @@ export interface Jwt
     iat: number;            // timestamp when this token was issued
     nbf: number;            // token accepted not before this timestamp
     exp: number|null;       // timestamp when expired this token
+    scopes?: string;        // scope that belong client
 }
 
 export interface MapperOptions

@@ -261,17 +261,17 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     // hook called after insert aggregates
     async insertedAggregateHook(aggregates: Aggregate[]):Promise<void> { /**/ }
 
-    async update(
+    async updateById(
         aggregate: Aggregate,
         {
-            updateOptions = undefined,
+            updateByIdOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
         }: {
-            updateOptions?: LiteralObject;
+            updateByIdOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
@@ -300,13 +300,49 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             emptyArrays : false,
         });
 
-        const model = await modelInDB.update(LiteralObject, updateOptions);
+        const model = await modelInDB.update(LiteralObject, updateByIdOptions);
 
-        this.updatedAggregateHook(aggregate, model);
+        this.updatedByIdAggregateHook(aggregate, model);
     }
 
     // hook called after update aggregate
-    async updatedAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
+    async updatedByIdAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
+
+    async update(
+        aggregate: Aggregate,
+        {
+            updateOptions = undefined,
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+        }: {
+            updateOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        // check allRows variable to allow update all rows
+        if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
+
+        // clean undefined fields, to avoid update undefined fields
+        const LiteralObject = cleanDeep(dataFactory(aggregate), {
+            nullValues  : false,
+            emptyStrings: false,
+            emptyObjects: false,
+            emptyArrays : false,
+        });
+
+        // execute update statement
+        await this.repository.update(
+            LiteralObject,
+            // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...updateOptions },
+        );
+    }
 
     async deleteById(
         id: UuidValueObject,
@@ -354,7 +390,8 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         } = {},
     ): Promise<void>
     {
-        if (!queryStatement || !queryStatement.where) throw new BadRequestException('To delete multiple records, you must define a where statement');
+        // check allRows variable to allow delete all rows
+        if (!queryStatement || !queryStatement.where || deleteOptions?.allRows) throw new BadRequestException('To delete multiple records, you must define a where statement');
 
         // check that aggregate exist
         await this.repository.destroy(

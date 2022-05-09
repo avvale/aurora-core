@@ -25,7 +25,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             nullValues  : false,
             emptyStrings: false,
             emptyObjects: false,
-            emptyArrays : false
+            emptyArrays : false,
         }));
     }
 
@@ -125,14 +125,14 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
     async create(
         aggregate: Aggregate,
         {
+            createOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
-            createOptions = undefined,
         }: {
+            createOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
-            createOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -148,32 +148,32 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
     async insert(
         aggregates: Aggregate[],
         {
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             insertOptions = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
         }: {
-            dataFactory?: (aggregate: Aggregate) => LiteralObject;
             insertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
     ): Promise<void>
     {
         /**/
     }
 
-    async update(
+    async updateById(
         aggregate: Aggregate,
         {
+            updateOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
-            updateOptions = undefined,
         }: {
+            updateOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             findArguments?: LiteralObject;
-            updateOptions?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -185,6 +185,28 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             if (item.id.value === aggregate.id.value) return aggregate;
             return item;
         });
+    }
+
+    async update(
+        aggregate: Aggregate,
+        {
+            updateOptions = undefined,
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+        }: {
+            updateOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        // check allRows variable to allow update all rows
+        if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
     }
 
     async deleteById(
@@ -220,6 +242,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         } = {},
     ): Promise<void>
     {
-        if (!Array.isArray(queryStatement) || queryStatement.length === 0) throw new BadRequestException('To delete multiple records, you must define a query statement');
+        // eslint-disable-next-line max-len
+        if (!Array.isArray(queryStatement) || queryStatement.length === 0 || deleteOptions?.allRows) throw new BadRequestException('To delete multiple records, you must define a query statement');
     }
 }
