@@ -76,15 +76,27 @@ export interface IRepository<Aggregate>
         }
     ): Promise<void>;
 
+    // update record by id
+    updateById(
+        item: Aggregate,
+        options?: {
+            updateByIdOptions?: LiteralObject;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
+        }
+    ): Promise<void>;
+
     // update record
     update(
         item: Aggregate,
         options?: {
             updateOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
-            findArguments?: LiteralObject;
         }
     ): Promise<void>;
 

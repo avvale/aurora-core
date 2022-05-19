@@ -1,1 +1,0 @@
-export * from './controllers/core-preparation-request.controller';

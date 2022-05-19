@@ -6,6 +6,6 @@ import './domain/shared/prototypes/array-remove-item.prototype';
 @Module({
     imports  : [],
     providers: [],
-    exports  : []
+    exports  : [],
 })
 export class CoreModule {}
