@@ -82,7 +82,7 @@ export class Utils
                 : obj;
     }
 
-    public static deepMapValues(obj, fn: Function): LiteralObject
+    public static deepMapValues(obj, fn: (val, key) => any): LiteralObject
     {
         if (Array.isArray(obj))
         {
@@ -93,7 +93,8 @@ export class Utils
         }
         else if (typeof obj === 'object')
         {
-            const res = {};
+            // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/null
+            const res = obj === null ? null : {};
             for (const key in obj)
             {
                 const val = obj[key];
