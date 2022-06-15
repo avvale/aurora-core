@@ -44,6 +44,26 @@ describe('NumberValueObject', () =>
             expect(mockDecimalValueObject.toString()).toBe('10.2');
         });
 
+        test('MockDecimalValueObject should be defined with undefined value', () =>
+        {
+            const mockDecimalValueObject = new MockDecimalValueObject(undefined, {
+                name       : 'MockDecimalValueObject',
+                undefinable: true,
+                decimals   : [2,1],
+            });
+            expect(mockDecimalValueObject.value).toBe(undefined);
+        });
+
+        test('MockDecimalValueObject should be defined with null value', () =>
+        {
+            const mockDecimalValueObject = new MockDecimalValueObject(null, {
+                name    : 'MockDecimalValueObject',
+                nullable: true,
+                decimals: [2,1],
+            });
+            expect(mockDecimalValueObject.value).toBe(null);
+        });
+
         test('MockDecimalValueObject should catch error: must be defined, BadRequestException: can not be null', () =>
         {
             expect(() =>

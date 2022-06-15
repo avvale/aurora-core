@@ -5,17 +5,20 @@ export abstract class DecimalValueObject extends NumberValueObject
 {
     set value(value: number)
     {
-        //if (value !== undefined && value !== null && Number.isNaN(value)) throw new BadRequestException(`Value for ${this.validationRules.name} has to be a number value`);
+        if (
+            !(this.validationRules.undefinable && value === undefined)
+        )
+        {
+            // get integers and decimals length
+            const decimalCounter = this.decimalCount(value);
+            const integersLimit = this.validationRules.decimals[0] - this.validationRules.decimals[1];
+            const decimalsLimit = this.validationRules.decimals[1];
 
-        // get integers and decimals length
-        const decimalCounter = this.decimalCount(value);
-        const integersLimit = this.validationRules.decimals[0] - this.validationRules.decimals[1];
-        const decimalsLimit = this.validationRules.decimals[1];
-
-        if (decimalCounter.integers > integersLimit)
-            throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${integersLimit} integers in ${value} number`);
-        if (decimalCounter.decimals > decimalsLimit)
-            throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${decimalsLimit} decimals in ${value} number`);
+            if (decimalCounter.integers > integersLimit)
+                throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${integersLimit} integers in ${value} number`);
+            if (decimalCounter.decimals > decimalsLimit)
+                throw new BadRequestException(`Value for ${this.validationRules.name} is too large, has a maximum length of ${decimalsLimit} decimals in ${value} number`);
+        }
 
         super.value = value;
     }
