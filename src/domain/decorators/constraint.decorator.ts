@@ -9,12 +9,12 @@ export const Constraint = createParamDecorator(
         if (context['contextType'] === 'graphql')
         {
             request = GqlExecutionContext.create(context).getContext().req;
+            return request.body.variables.constraint;
         }
         else if (context['contextType'] === 'http')
         {
             request = context.switchToHttp().getRequest();
+            return request.body.constraint;
         }
-
-        return request.body['constraint'];
-    }
+    },
 );
