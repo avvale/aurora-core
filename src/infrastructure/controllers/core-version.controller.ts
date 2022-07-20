@@ -15,6 +15,7 @@ export class CoreVersionController
         const packageFile = JSON.parse(fs.readFileSync(process.cwd() + '/package.json', 'utf8'));
 
         return {
+            name   : packageFile.name,
             version: packageFile.version,
         };
     }
