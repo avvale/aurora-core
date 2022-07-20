@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 
