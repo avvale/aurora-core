@@ -3,12 +3,12 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
 import * as fs from 'node:fs';
 
-@ApiTags('[core] version')
-@Controller('core/version')
-export class CoreVersionController
+@ApiTags('[core] environment information')
+@Controller('core/environment-information')
+export class CoreEnvironmentInformationController
 {
     @Get()
-    @ApiOperation({ summary: 'Get server version' })
+    @ApiOperation({ summary: 'Get server environment information' })
     @ApiCreatedResponse({ description: 'Version of server obtained from the package.json file' })
     async main()
     {
