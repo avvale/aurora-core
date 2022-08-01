@@ -51,7 +51,7 @@ export class Utils
     }
 
     // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static deepDiff(a: LiteralObject, b: LiteralObject, r: LiteralObject, reversible: boolean): void
+    public static deepDiff(a: LiteralObject, b: LiteralObject, r: LiteralObject, reversible: boolean = false): void
     {
         _.each(a, function(v, k) {
             // already checked this or equal...
@@ -72,7 +72,7 @@ export class Utils
     }
 
     // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static diff(a: LiteralObject, b: LiteralObject, reversible: boolean): LiteralObject
+    public static diff(a: LiteralObject, b: LiteralObject, reversible: boolean = false): LiteralObject
     {
         const r = {};
         Utils.deepDiff(a, b, r, reversible);
