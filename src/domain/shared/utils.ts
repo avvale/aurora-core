@@ -8,6 +8,7 @@ import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import * as advancedFormat from 'dayjs/plugin/advancedFormat';
 import * as dayjs from 'dayjs';
+import * as _ from 'lodash';
 declare const Buffer: any;
 
 dayjs.extend(utc);
@@ -47,6 +48,36 @@ export class Utils
     public static base64Decode(data: string): string
     {
         return Buffer.from(data, 'base64').toString('utf-8');
+    }
+
+    // http://jsfiddle.net/drzaus/9g5qoxwj/
+    public static deepDiff(a: LiteralObject, b: LiteralObject, r: LiteralObject, reversible: boolean): void
+    {
+        _.each(a, function(v, k) {
+            // already checked this or equal...
+            // eslint-disable-next-line no-prototype-builtins
+            if (r.hasOwnProperty(k) || b[k] === v) return;
+            // but what if it returns an empty object? still attach?
+            r[k] = _.isObject(v) ? Utils.diff(v, b[k], reversible) : v;
+        });
+    }
+
+    // http://jsfiddle.net/drzaus/9g5qoxwj/
+    public static shallowDiff(a: LiteralObject, b: LiteralObject): LiteralObject
+    {
+        return _.omitBy(a, (value, key) =>
+        {
+            return b[key] === value;
+        });
+    }
+
+    // http://jsfiddle.net/drzaus/9g5qoxwj/
+    public static diff(a: LiteralObject, b: LiteralObject, reversible: boolean): LiteralObject
+    {
+        const r = {};
+        Utils.deepDiff(a, b, r, reversible);
+        if(reversible) Utils.deepDiff(b, a, r, reversible);
+        return r;
     }
 
     // map deeply object keys
