@@ -17,6 +17,28 @@ dayjs.extend(advancedFormat);
 
 export class Utils
 {
+    public static arrayRemoveItem<T = any>(arr: T[], value: T | T[]): T[]
+    {
+        let arrValues: T[];
+        if (Array.isArray(value))
+        {
+            arrValues = value;
+        }
+        else
+        {
+            if (value)
+            {
+                arrValues = [value];
+            }
+            else
+            {
+                return [];
+            }
+        }
+
+        return arr.filter(ele => !arrValues.includes(ele));
+    }
+
     public static now(): dayjs.Dayjs
     {
         return dayjs();
@@ -159,7 +181,7 @@ export class Utils
         return mime.getType(extension);
     }
 
-    public static isImageMime(mime: string)
+    public static isImageMime(mime: string): boolean
     {
         switch (mime)
         {
