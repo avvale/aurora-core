@@ -73,14 +73,22 @@ export class Utils
     }
 
     // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static deepDiff(a: LiteralObject, b: LiteralObject, r: LiteralObject, reversible: boolean = false): void
+    public static deepDiff(a: LiteralObject, b: LiteralObject, result: LiteralObject, reversible: boolean = false): void
     {
-        _.each(a, function(v, k) {
+        _.each(a, function(value, key)
+        {
+            // is is a array use equals prototype definition to compare
+            if (Array.isArray(value))
+            {
+                if (value.equals(b[key])) return;
+                result[key] = a[key];
+            }
+
             // already checked this or equal...
             // eslint-disable-next-line no-prototype-builtins
-            if (r.hasOwnProperty(k) || b[k] === v) return;
+            if (result.hasOwnProperty(key) || b[key] === value) return;
             // but what if it returns an empty object? still attach?
-            r[k] = _.isObject(v) ? Utils.diff(v, b[k], reversible) : v;
+            result[key] = _.isObject(value) ? Utils.diff(value, b[key], reversible) : value;
         });
     }
 
