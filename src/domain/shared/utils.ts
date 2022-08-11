@@ -72,42 +72,21 @@ export class Utils
         return Buffer.from(data, 'base64').toString('utf-8');
     }
 
-    // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static deepDiff(a: LiteralObject, b: LiteralObject, result: LiteralObject, reversible: boolean = false): void
+    public static diff(newObj, origObj): any
     {
-        _.each(a, function(value, key)
+        const changes = (newObj, origObj): any =>
         {
-            // is is a array use equals prototype definition to compare
-            if (Array.isArray(value))
+            let arrayIndexCounter = 0;
+            return _.transform(newObj, (result, value, key) =>
             {
-                if (value.equals(b[key])) return;
-                result[key] = a[key];
-            }
-
-            // already checked this or equal...
-            // eslint-disable-next-line no-prototype-builtins
-            if (result.hasOwnProperty(key) || b[key] === value) return;
-            // but what if it returns an empty object? still attach?
-            result[key] = _.isObject(value) ? Utils.diff(value, b[key], reversible) : value;
-        });
-    }
-
-    // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static shallowDiff(a: LiteralObject, b: LiteralObject): LiteralObject
-    {
-        return _.omitBy(a, (value, key) =>
-        {
-            return b[key] === value;
-        });
-    }
-
-    // http://jsfiddle.net/drzaus/9g5qoxwj/
-    public static diff(a: LiteralObject, b: LiteralObject, reversible: boolean = false): LiteralObject
-    {
-        const r = {};
-        Utils.deepDiff(a, b, r, reversible);
-        if(reversible) Utils.deepDiff(b, a, r, reversible);
-        return r;
+                if (!_.isEqual(value, origObj[key]))
+                {
+                    const resultKey = _.isArray(origObj) ? arrayIndexCounter++ : key;
+                    result[resultKey] = (_.isObject(value) && _.isObject(origObj[key])) ? changes(value, origObj[key]) : value;
+                }
+            });
+        };
+        return changes(newObj, origObj);
     }
 
     // map deeply object keys
