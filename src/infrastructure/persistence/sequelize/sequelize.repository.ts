@@ -40,6 +40,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const total = await this.repository.count(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(hookCountResponse.queryStatement, hookCountResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
         );
 
         // manage hook compose paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
@@ -49,6 +50,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const { count, rows } = await this.repository.findAndCountAll(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(hookComposeResponse.queryStatement, hookComposeResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
         );
 
         return {
@@ -80,11 +82,18 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementFindHook(_.merge(queryStatement, constraint), cQMetadata);
 
         const model = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
+            await this.repository.sequelize.query(
+                queryStatement.rawSQL,
+                {
+                    ...cQMetadata?.repositoryOptions,
+                    type: QueryTypes.SELECT,
+                },
+            )
             :
             await this.repository.findOne(
                 // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
                 this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+                cQMetadata?.repositoryOptions,
             );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
@@ -120,6 +129,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const model = await this.repository.findOne(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
         );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} with id: ${id.value}, not found`);
@@ -147,11 +157,18 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementGetHook(_.merge(queryStatement, constraint), cQMetadata);
 
         const models = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
+            await this.repository.sequelize.query(
+                queryStatement.rawSQL,
+                {
+                    ...cQMetadata?.repositoryOptions,
+                    type: QueryTypes.SELECT,
+                },
+            )
             :
             await this.repository.findAll(
                 // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
                 this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+                cQMetadata?.repositoryOptions,
             );
 
         // map values to create value objects
@@ -178,11 +195,18 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementCountHook(_.merge(queryStatement, constraint), cQMetadata);
 
         const nRecords = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(queryStatement.rawSQL, { type: QueryTypes.SELECT })
+            await this.repository.sequelize.query(
+                queryStatement.rawSQL,
+                {
+                    ...cQMetadata?.repositoryOptions,
+                    type: QueryTypes.SELECT,
+                },
+            )
             :
             await this.repository.count(
                 // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
                 this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+                cQMetadata?.repositoryOptions,
             );
 
         return nRecords;
