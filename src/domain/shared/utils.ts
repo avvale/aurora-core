@@ -7,6 +7,7 @@ import * as mime from 'mime';
 import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import * as advancedFormat from 'dayjs/plugin/advancedFormat';
+import * as customParseFormat from 'dayjs/plugin/customParseFormat';
 import * as dayjs from 'dayjs';
 import * as _ from 'lodash';
 declare const Buffer: any;
@@ -14,6 +15,7 @@ declare const Buffer: any;
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
+dayjs.extend(customParseFormat);
 
 export class Utils
 {
@@ -30,6 +32,11 @@ export class Utils
     public static nowDate(): string
     {
         return dayjs().format('YYYY-MM-DD');
+    }
+
+    public static dateFromFormat(date: string, format: string): dayjs.Dayjs
+    {
+        return dayjs(date, format);
     }
 
     public static sha1(data: string): string
