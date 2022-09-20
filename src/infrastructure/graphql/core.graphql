@@ -13,8 +13,10 @@ scalar GraphQLUpload
 input QueryStatement
 {
     where: JSON
+    attributes: JSON
     include: [GraphQLString]
     order: JSON
+    group: JSON
     limit: GraphQLInt
     offset: GraphQLInt
 }
