@@ -100,6 +100,15 @@ export interface IRepository<Aggregate>
         }
     ): Promise<void>;
 
+    // insert or update key identification elements already existing in the table
+    upsert(
+        items: Aggregate[],
+        options?: {
+            upsertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        }
+    ): Promise<void>;
+
     // delete record by id
     deleteById(
         id: ValueObject<string>,

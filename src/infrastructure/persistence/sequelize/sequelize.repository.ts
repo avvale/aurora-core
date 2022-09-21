@@ -266,7 +266,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<void>
     {
         /********
-         * user insertOptions to add properties like updateOnDuplicate
+         *  user insertOptions to add properties like updateOnDuplicate
          *  {
          *      repositoryOptions: {
          *          updateOnDuplicate: [
@@ -277,7 +277,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
          *  }
          */
 
-        await this.repository.bulkCreate(aggregates.map(item => dataFactory(item)), insertOptions);
+        await this.repository.bulkCreate(
+            aggregates.map(item => dataFactory(item)),
+            insertOptions,
+        );
 
         this.insertedAggregateHook(aggregates);
     }
@@ -367,6 +370,29 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...updateOptions },
         );
     }
+
+    async upsert(
+        aggregates: Aggregate[],
+        {
+            upsertOptions = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+        }: {
+            upsertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        // execute update statement
+        await this.repository.upsert(
+            aggregates.map(item => dataFactory(item)),
+            upsertOptions,
+        );
+
+        this.upsertedAggregateHook(aggregates);
+    }
+
+    // hook called after upsert aggregates
+    async upsertedAggregateHook(aggregates: Aggregate[]):Promise<void> { /**/ }
 
     async deleteById(
         id: UuidValueObject,
