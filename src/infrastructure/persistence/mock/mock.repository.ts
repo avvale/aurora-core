@@ -209,6 +209,20 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
     }
 
+    async upsert(
+        aggregates: Aggregate[],
+        {
+            upsertOptions = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+        }: {
+            upsertOptions?: LiteralObject;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        /**/
+    }
+
     async deleteById(
         id: UuidValueObject,
         {
