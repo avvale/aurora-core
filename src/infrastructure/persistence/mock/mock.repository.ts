@@ -210,7 +210,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
     }
 
     async upsert(
-        aggregates: Aggregate[],
+        aggregate: Aggregate,
         {
             upsertOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
