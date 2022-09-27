@@ -241,7 +241,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         try
         {
-            const model = await this.repository.create(dataFactory(aggregate), createOptions);
+            const model = await this.repository
+                .create(
+                    dataFactory(aggregate),
+                    createOptions,
+                );
 
             this.createdAggregateHook(aggregate, model);
         }
@@ -353,7 +357,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<void>
     {
         // check allRows variable to allow update all rows
-        if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
+        if (
+            !queryStatement ||
+            !queryStatement.where ||
+            updateOptions?.allRows
+        ) throw new BadRequestException('To update multiple records, you must define a where statement');
 
         // clean undefined fields, to avoid update undefined fields
         const LiteralObject = cleanDeep(dataFactory(aggregate), {
@@ -372,7 +380,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     async upsert(
-        aggregates: Aggregate[],
+        aggregate: Aggregate,
         {
             upsertOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
@@ -383,16 +391,17 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<void>
     {
         // execute update statement
-        await this.repository.upsert(
-            aggregates.map(item => dataFactory(item)),
-            upsertOptions,
-        );
+        await this.repository
+            .upsert(
+                dataFactory(aggregate),
+                upsertOptions,
+            );
 
-        this.upsertedAggregateHook(aggregates);
+        this.upsertedAggregateHook(aggregate);
     }
 
     // hook called after upsert aggregates
-    async upsertedAggregateHook(aggregates: Aggregate[]):Promise<void> { /**/ }
+    async upsertedAggregateHook(aggregates: Aggregate):Promise<void> { /**/ }
 
     async deleteById(
         id: UuidValueObject,
@@ -441,7 +450,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<void>
     {
         // check allRows variable to allow delete all rows
-        if (!queryStatement || !queryStatement.where || deleteOptions?.allRows) throw new BadRequestException('To delete multiple records, you must define a where statement');
+        if (
+            !queryStatement ||
+            !queryStatement.where ||
+            deleteOptions?.allRows
+        ) throw new BadRequestException('To delete multiple records, you must define a where statement');
 
         // check that aggregate exist
         await this.repository.destroy(

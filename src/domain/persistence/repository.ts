@@ -102,7 +102,7 @@ export interface IRepository<Aggregate>
 
     // insert or update key identification elements already existing in the table
     upsert(
-        items: Aggregate[],
+        item: Aggregate,
         options?: {
             upsertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
