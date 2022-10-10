@@ -1,4 +1,5 @@
 export * from './bigint.value-object';
+export * from './blob.value-object';
 export * from './boolean.value-object';
 export * from './coordinate.value-object';
 export * from './date.value-object';

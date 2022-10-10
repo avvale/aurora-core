@@ -224,7 +224,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         {
             createOptions = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
             // arguments to find object and check if object is duplicated
             finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
         }: {
@@ -262,7 +262,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregates: Aggregate[],
         {
             insertOptions = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
         }: {
             insertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
@@ -298,7 +298,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             updateByIdOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
             // arguments to find object to update, with i18n we use langId and id relationship with parent entity
             findArguments = { id: aggregate['id']['value'] },
         }: {
@@ -346,7 +346,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             queryStatement = {},
             constraint = {},
             cQMetadata = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
         }: {
             updateOptions?: LiteralObject;
             queryStatement?: QueryStatement;
@@ -383,7 +383,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         {
             upsertOptions = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
         }: {
             upsertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;

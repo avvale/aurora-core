@@ -10,4 +10,5 @@ export interface AggregateBase
     deletedAt?: TimestampValueObject;
 
     toDTO(): LiteralObject;
+    toRepository(): LiteralObject;
 }
