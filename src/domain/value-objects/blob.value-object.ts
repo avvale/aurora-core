@@ -9,6 +9,12 @@ export abstract class BlobValueObject extends ValueObject<string | Buffer>
         super.value = value;
     }
 
+    get value(): string
+    {
+        if (typeof super.value === 'string') return super.value;
+        throw new BadRequestException(`The value for BlobValueObject must must to be a string base64, your type is ${typeof super.value}`);
+    }
+
     get buffer(): Buffer
     {
         if (typeof super.value === 'string') return Buffer.from(super.value, 'base64');
