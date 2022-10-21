@@ -336,7 +336,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         this.updatedByIdAggregateHook(aggregate, model);
     }
 
-    // hook called after update aggregate
+    // hook called after update by id aggregate
     async updatedByIdAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
 
     async update(
@@ -372,12 +372,17 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         });
 
         // execute update statement
-        await this.repository.update(
+        const model = await this.repository.update(
             LiteralObject,
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...updateOptions },
         );
+
+        this.updatedAggregateHook(aggregate, model);
     }
+
+    // hook called after update by id aggregate
+    async updatedAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
 
     async upsert(
         aggregate: Aggregate,
