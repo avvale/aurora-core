@@ -94,6 +94,19 @@ export class Utils
         return arr.filter(ele => !arrValues.includes(ele));
     }
 
+    public static arraysHasSameValues<T = any>(arr1: T[], arr2: T[]): boolean
+    {
+        if (arr1.length === arr2.length)
+        {
+            return arr1.every(element =>
+            {
+                if (arr2.includes(element)) return true;
+                return false;
+            });
+        }
+        return false;
+    }
+
     // map deeply object keys
     public static deepMapKeys(obj, fn): LiteralObject
     {
