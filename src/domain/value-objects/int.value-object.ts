@@ -3,7 +3,7 @@ import { NumberValueObject } from './number.value-object';
 
 export abstract class IntValueObject extends NumberValueObject
 {
-    set value(value: number)
+    set value(value: number | null | undefined)
     {
         if (
             value !== undefined &&

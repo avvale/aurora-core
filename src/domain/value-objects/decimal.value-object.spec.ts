@@ -5,9 +5,9 @@ import { DecimalValueObject } from './decimal.value-object';
 
 class MockDecimalValueObject extends DecimalValueObject
 {
-    public readonly type: 'MockDecimalValueObject';
+    public readonly type: string = 'MockDecimalValueObject';
 
-    constructor(value: number, validationRules: ValidationRules = {})
+    constructor(value: number | null | undefined, validationRules: ValidationRules = {})
     {
         super(value, validationRules);
     }

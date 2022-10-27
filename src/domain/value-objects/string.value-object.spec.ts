@@ -5,7 +5,7 @@ import { StringValueObject } from './string.value-object';
 
 class MockStringValueObject extends StringValueObject
 {
-    public readonly type: 'MockStringValueObject';
+    public readonly type: string = 'MockStringValueObject';
 
     constructor(value: string, validationRules: ValidationRules = {})
     {

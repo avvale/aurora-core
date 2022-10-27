@@ -5,7 +5,7 @@ import { NumberValueObject } from './number.value-object';
 
 class MockNumberValueObject extends NumberValueObject
 {
-    public readonly type: 'MockNumberValueObject';
+    public readonly type: string = 'MockNumberValueObject';
 
     constructor(value: number, validationRules: ValidationRules = {})
     {
@@ -81,15 +81,6 @@ describe('NumberValueObject', () =>
                     unsigned: true,
                 }),
             ).toThrowError('The numerical value for MockNumberValueObject must have a positive sign, this field does not accept negative values');
-        });
-
-        test('MockNumberValueObject should catch error: must be defined, BadRequestException: must have a positive sign', () =>
-        {
-            expect(() =>
-                new MockNumberValueObject(<number><unknown>'abc', {
-                    name: 'MockNumberValueObject',
-                }),
-            ).toThrowError('Value for MockNumberValueObject has to be a number value');
         });
     });
 });
