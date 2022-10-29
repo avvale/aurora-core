@@ -11,9 +11,18 @@ export abstract class ValueObject<T> implements IValueObject<T>
     protected _value: T;
     set value(value: T)
     {
-        // validate nullable and undefinable values
-        if (this.validationRules.nullable === false && value === null && !this.validationRules.default)          throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be null`);
-        if (this.validationRules.undefinable === false && value === undefined && !this.validationRules.default)  throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be undefined`);
+        // validate nullable values
+        if (this.validationRules.nullable === false && value === null && !this.validationRules.default)
+        {
+            throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be null`);
+        }
+
+        // validate undefinable values
+        if (this.validationRules.undefinable === false && value === undefined && !this.validationRules.default)
+        {
+            throw new BadRequestException(`Value for ${this.validationRules.name} must be defined, can not be undefined`);
+        }
+
         if (
             ((this.validationRules.nullable === false && value === null) ||
             (this.validationRules.undefinable === false && value === undefined))
