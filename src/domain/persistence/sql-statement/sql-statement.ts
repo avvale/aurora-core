@@ -47,6 +47,9 @@ export class QueryStatement
 
     /**
      * GROUP BY in sql
+     * Used in conjunction with `attributes`.
+     *
+     * @see Projectable
      */
     group?: any;
 
@@ -91,4 +94,14 @@ export class QueryStatement
      * MySQL only
      */
     indexHints?: IndexHint[];
+
+    /**
+     * Apply COUNT(DISTINCT(col))
+     */
+    distinct?: boolean;
+
+    /**
+     * The column to aggregate on.
+     */
+    col?: string;
 }

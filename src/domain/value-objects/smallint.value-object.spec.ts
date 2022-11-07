@@ -33,6 +33,14 @@ describe('NumberValueObject', () =>
             expect(mockNumberValueObject.toString()).toBe('10');
         });
 
+        test('MockSmallintValueObject should be defined with 0 value', () =>
+        {
+            const mockNumberValueObject = new MockSmallintValueObject(0, {
+                name: 'MockSmallintValueObject',
+            });
+            expect(mockNumberValueObject.value).toBe(0);
+        });
+
         test('MockSmallintValueObject should be have max length of 5 digits', () =>
         {
             expect(() =>

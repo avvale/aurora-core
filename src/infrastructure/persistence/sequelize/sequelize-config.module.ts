@@ -21,7 +21,7 @@ import { Dialect } from 'sequelize/types';
                     username      : configService.get<string>('DATABASE_USER'),
                     password      : configService.get<string>('DATABASE_PASSWORD'),
                     database      : configService.get<string>('DATABASE_SCHEMA'),
-                    synchronize   : configService.get<boolean>('DATABASE_SYNCHRONIZE'),
+                    synchronize   : configService.get<string>('DATABASE_SYNCHRONIZE') === 'true' ? true : false,
                     logging       : configService.get<string>('DATABASE_LOGGIN') === 'true' ? console.log : false,
                     autoLoadModels: true,
                     models        : [],
