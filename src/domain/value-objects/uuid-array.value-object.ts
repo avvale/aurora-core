@@ -1,10 +1,10 @@
 import { JsonValueObject } from './json.value-object';
 
-export abstract class UuidArrayValueObject extends JsonValueObject
+export abstract class UuidArrayValueObject extends JsonValueObject<string | string[]>
 {
     get length(): number
     {
-        return this.value?.length;
+        return super.value?.length;
     }
 
     isArray(): boolean

@@ -1,6 +1,6 @@
 import { ValueObject } from './value-object';
 
-export abstract class JsonValueObject extends ValueObject<string>
+export abstract class JsonValueObject<T = string | object> extends ValueObject<T>
 {
     set value(value: any)
     {
