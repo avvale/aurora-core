@@ -9,7 +9,6 @@ import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { Pagination } from '../../../domain/shared/pagination';
-import * as _ from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
@@ -44,7 +43,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         );
 
         // manage hook compose paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
-        const hookComposeResponse = this.composeStatementPaginateHook(_.merge(queryStatement, constraint), cQMetadata);
+        const hookComposeResponse = this.composeStatementPaginateHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
 
         // get records
         const { count, rows } = await this.repository.findAndCountAll(
@@ -79,7 +84,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<Aggregate>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
-        const hookResponse = this.composeStatementFindHook(_.merge(queryStatement, constraint), cQMetadata);
+        const hookResponse = this.composeStatementFindHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
 
         const model = queryStatement.rawSQL ?
             await this.repository.sequelize.query(
@@ -118,11 +129,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementFindByIdHook(
-            _.merge({
-                where: {
-                    id: id.value,
+            this.criteria.mergeQueryConstraintStatement(
+                {
+                    where: {
+                        id: id.value,
+                    },
                 },
-            }, constraint), cQMetadata,
+                constraint,
+            ),
+            cQMetadata,
         );
 
         // value is already mapped
@@ -154,7 +169,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<Aggregate[]>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
-        const hookResponse = this.composeStatementGetHook(_.merge(queryStatement, constraint), cQMetadata);
+        const hookResponse = this.composeStatementGetHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
 
         const models = queryStatement.rawSQL ?
             await this.repository.sequelize.query(
@@ -192,7 +213,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<number>
     {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
-        const hookResponse = this.composeStatementCountHook(_.merge(queryStatement, constraint), cQMetadata);
+        const hookResponse = this.composeStatementCountHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
 
         const nRecords = queryStatement.rawSQL ?
             await this.repository.sequelize.query(
@@ -314,10 +341,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const modelInDB = await this.repository.findOne(
             // pass constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(
-                _.merge(
-                    { where: findArguments },
+                this.criteria.mergeQueryConstraintStatement(
+                    {
+                        where: findArguments,
+                    },
                     constraint,
-                ), cQMetadata,
+                ),
+                cQMetadata,
             ),
         );
 
@@ -375,7 +405,16 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const model = await this.repository.update(
             LiteralObject,
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...updateOptions },
+            {
+                ...this.criteria.implements(
+                    this.criteria.mergeQueryConstraintStatement(
+                        queryStatement,
+                        constraint,
+                    ),
+                    cQMetadata,
+                ),
+                ...updateOptions,
+            },
         );
 
         this.updatedAggregateHook(aggregate, model);
@@ -425,13 +464,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const model = await this.repository.findOne(
             // pass constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(
-                _.merge(
+                this.criteria.mergeQueryConstraintStatement(
                     {
                         where: {
                             id: id.value,
                         },
-                    }, constraint,
-                ), cQMetadata,
+                    },
+                    constraint,
+                ),
+                cQMetadata,
             ),
         );
 
@@ -464,7 +505,16 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // check that aggregate exist
         await this.repository.destroy(
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            { ...this.criteria.implements(_.merge(queryStatement, constraint), cQMetadata), ...deleteOptions },
+            {
+                ...this.criteria.implements(
+                    this.criteria.mergeQueryConstraintStatement(
+                        queryStatement,
+                        constraint,
+                    ),
+                    cQMetadata,
+                ),
+                ...deleteOptions,
+            },
         );
     }
 }

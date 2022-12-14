@@ -10,10 +10,14 @@ import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-st
 import { CQMetadata } from '../../../domain/aurora.types';
 import { Utils } from '../../../domain/shared/utils';
 import { Operator } from '../../../domain/persistence/sql-statement/operator';
+import { merge, isEmpty } from 'lodash';
 
 export class SequelizeCriteria implements ICriteria
 {
-    implements(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): QueryStatement
+    implements(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): QueryStatement
     {
         // add timezone to query statement
         if (cQMetadata?.timezone)
@@ -46,5 +50,23 @@ export class SequelizeCriteria implements ICriteria
                 ? Op[key.slice(1,-1)]
                 : key,
         );
+    }
+
+    mergeQueryConstraintStatement(
+        queryStatement: QueryStatement,
+        constraint: QueryStatement,
+    ): QueryStatement
+    {
+        // merge query and constraint
+        const finalQueryStatement = merge(queryStatement, constraint);
+
+        // only overwrite where statement if both query and constraint have where
+        if (!isEmpty(queryStatement.where) && !isEmpty(constraint.where))
+        {
+            finalQueryStatement.where = {
+                [Op.and]: [queryStatement.where, constraint.where],
+            };
+        }
+        return finalQueryStatement;
     }
 }

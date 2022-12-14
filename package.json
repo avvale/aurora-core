@@ -1,6 +1,6 @@
 {
-  "name": "aurora-ts-core",
-  "version": "2.0.7",
+  "name": "@aurora-ts/core",
+  "version": "2.0.8",
   "description": "Aurora npm package starter",
   "author": "Jose Carlos Rodriguez Palacín <carlos.rodriguez.palacin@gmail.com>",
   "license": "MIT",
@@ -23,7 +23,7 @@
     "cache-manager": "^5.1.1",
     "clean-deep": "^3.4.0",
     "dayjs": "^1.11.6",
-    "sequelize": "^6.25.3",
+    "sequelize": "^6.27.0",
     "sequelize-typescript": "^2.1.5",
     "uuid-validate": "0.0.3"
   },
@@ -93,5 +93,8 @@
     ],
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
