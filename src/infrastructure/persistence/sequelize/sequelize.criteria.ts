@@ -57,16 +57,17 @@ export class SequelizeCriteria implements ICriteria
         constraint: QueryStatement,
     ): QueryStatement
     {
-        // merge query and constraint
-        const finalQueryStatement = merge(queryStatement, constraint);
+        // merge query and constraint, merge on variables references, clone objects to a
+        const finalQueryStatement = merge({}, queryStatement, constraint);
 
         // only overwrite where statement if both query and constraint have where
         if (!isEmpty(queryStatement.where) && !isEmpty(constraint.where))
         {
             finalQueryStatement.where = {
-                [Op.and]: [queryStatement.where, constraint.where],
+                [Operator.and]: [queryStatement.where, constraint.where],
             };
         }
+
         return finalQueryStatement;
     }
 }
