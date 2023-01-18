@@ -103,6 +103,20 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         return this.collectionSource;
     }
 
+    // done rawSQL statement
+    async rawSQL(
+        {
+            rawSQL = undefined,
+            cQMetadata = undefined,
+        }: {
+            rawSQL?: string;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<Aggregate[]>
+    {
+        return this.collectionSource;
+    }
+
     async count(
         {
             queryStatement = {},

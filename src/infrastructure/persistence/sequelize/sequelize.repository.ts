@@ -65,10 +65,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         };
     }
 
-    // hook to add findOptions
+    // hook when pagination count is done
     countStatementPaginateHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
 
-    // hook to add findOptions
+    // hook when compose pagination statement
     composeStatementPaginateHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
 
     async find(
@@ -92,20 +92,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata,
         );
 
-        const model = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(
-                queryStatement.rawSQL,
-                {
-                    ...cQMetadata?.repositoryOptions,
-                    type: QueryTypes.SELECT,
-                },
-            )
-            :
-            await this.repository.findOne(
-                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-                cQMetadata?.repositoryOptions,
-            );
+        const model = await this.repository.findOne(
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
 
@@ -113,7 +104,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         return <Aggregate>this.mapper.mapModelToAggregate(model, cQMetadata);
     }
 
-    // hook to add findOptions
+    // hook when compose find statement
     composeStatementFindHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
 
     async findById(
@@ -152,7 +143,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         return <Aggregate>this.mapper.mapModelToAggregate(model, cQMetadata);
     }
 
-    // hook to add findOptions
+    // hook when compose find by id statement
     composeStatementFindByIdHook(queryStatement: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
 
     // get multiple records
@@ -177,27 +168,44 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata,
         );
 
-        const models = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(
-                queryStatement.rawSQL,
-                {
-                    ...cQMetadata?.repositoryOptions,
-                    type: QueryTypes.SELECT,
-                },
-            )
-            :
-            await this.repository.findAll(
-                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-                cQMetadata?.repositoryOptions,
-            );
+        const models = await this.repository.findAll(
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
 
         // map values to create value objects
         return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
     }
 
-    // hook to add findOptions
+    // hook when compose get statement
     composeStatementGetHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+
+    // done rawSQL statement
+    async rawSQL(
+        {
+            rawSQL = undefined,
+            cQMetadata = undefined,
+        }: {
+            rawSQL?: string;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<Aggregate[]>
+    {
+        const models = await this.repository.sequelize.query(
+            this.composeStatementRawSQLHook(rawSQL),
+            {
+                ...cQMetadata?.repositoryOptions,
+                type: QueryTypes.SELECT, // can't be overwrite this value, always will be SELECTs for raw sql
+            },
+        );
+
+        // with rawSQL always return array of models
+        return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
+    }
+
+    // hook when raw sql is done
+    composeStatementRawSQLHook(rawSQL: string): string { return rawSQL; }
 
     // count records
     async count(
@@ -221,20 +229,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata,
         );
 
-        const nRecords = queryStatement.rawSQL ?
-            await this.repository.sequelize.query(
-                queryStatement.rawSQL,
-                {
-                    ...cQMetadata?.repositoryOptions,
-                    type: QueryTypes.SELECT,
-                },
-            )
-            :
-            await this.repository.count(
-                // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-                this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
-                cQMetadata?.repositoryOptions,
-            );
+        const nRecords = await this.repository.count(
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
 
         return nRecords;
     }

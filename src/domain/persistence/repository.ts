@@ -44,6 +44,14 @@ export interface IRepository<Aggregate>
         }
     ): Promise<Aggregate[]>;
 
+    // get records with rawSQL
+    rawSQL?(
+        options?: {
+            rawSQL?: string;
+            cQMetadata?: CQMetadata;
+        }
+    ): Promise<Aggregate[]>;
+
     // count records
     count(
         options?: {

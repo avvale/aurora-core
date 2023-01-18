@@ -11,11 +11,6 @@ export interface IndexHint
 export class QueryStatement
 {
     /**
-     * SQL raw, to execute complex queries, the database engine will not be taken into account.
-     */
-    rawSQL?: string;
-
-    /**
      * Attribute has to be matched for rows to be selected for the given action.
      */
     where?: any;
