@@ -7,7 +7,6 @@ import * as mime from 'mime';
 import * as utc from 'dayjs/plugin/utc';
 import * as timezone from 'dayjs/plugin/timezone';
 import * as advancedFormat from 'dayjs/plugin/advancedFormat';
-import * as dayOfYear from 'dayjs/plugin/dayOfYear';
 import * as dayjs from 'dayjs';
 import * as _ from 'lodash';
 declare const Buffer: any;
@@ -15,7 +14,6 @@ declare const Buffer: any;
 dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
-dayjs.extend(dayOfYear);
 
 export class Utils
 {
