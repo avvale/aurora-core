@@ -3,7 +3,7 @@ import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse } from '../../../domain/aurora.types';
-import { IAuditingRunner, ICriteria, IRepository } from '../../../domain';
+import { AuditingRunner, ICriteria, IRepository } from '../../../domain';
 import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
@@ -18,7 +18,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     public readonly criteria: ICriteria;
     public readonly aggregateName: string;
     public readonly mapper: IMapper;
-    public readonly auditingRunner: IAuditingRunner;
+    public readonly auditingRunner: AuditingRunner;
 
     async paginate(
         {

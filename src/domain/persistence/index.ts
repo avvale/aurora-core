@@ -1,4 +1,4 @@
-export { IAuditingRunner } from './auditing-runner';
+export { AuditingRunner } from './auditing-runner';
 export { ICriteria } from './criteria';
 export { IRepository } from './repository';
 export { IndexHints } from './sql-statement/index-hints';

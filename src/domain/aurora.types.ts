@@ -1,6 +1,6 @@
 import { LiteralObject } from '@nestjs/common';
 import { QueryStatement } from './persistence/sql-statement/sql-statement';
-import { IAuditingRunner } from './persistence/auditing-runner';
+import { AuditingRunner } from './persistence/auditing-runner';
 
 export interface AuditingAccount
 {
@@ -11,7 +11,7 @@ export interface AuditingAccount
 export interface AuditingMeta<T extends AuditingAccount = AuditingAccount>
 {
     ip: string;
-    auditingRunner?: IAuditingRunner;
+    auditingRunner?: AuditingRunner;
     userAgent: string;
     method: string;
     baseUrl: string;

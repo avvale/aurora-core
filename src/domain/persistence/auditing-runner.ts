@@ -1,6 +1,6 @@
 import { AuditingMeta } from '../aurora.types';
 
-export abstract class IAuditingRunner
+export abstract class AuditingRunner
 {
     abstract create(
         auditingMeta: AuditingMeta,
