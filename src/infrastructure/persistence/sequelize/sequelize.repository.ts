@@ -3,8 +3,7 @@ import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { CQMetadata, HookResponse } from '../../../domain/aurora.types';
-import { IRepository } from '../../../domain/persistence/repository';
-import { ICriteria } from '../../../domain/persistence/criteria';
+import { IAuditingRunner, ICriteria, IRepository } from '../../../domain';
 import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
@@ -19,6 +18,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     public readonly criteria: ICriteria;
     public readonly aggregateName: string;
     public readonly mapper: IMapper;
+    public readonly auditingRunner: IAuditingRunner;
 
     async paginate(
         {
@@ -267,6 +267,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         try
         {
+            // set auditingRunner to implement DI in model
+            if (createOptions.auditing) createOptions.auditing.auditingRunner = this.auditingRunner;
+
             const model = await this.repository
                 .create(
                     dataFactory(aggregate),
@@ -306,6 +309,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
          *      },
          *  }
          */
+
+        // set auditingRunner to implement DI in model
+        if (insertOptions.auditing) insertOptions.auditing.auditingRunner = this.auditingRunner;
 
         await this.repository.bulkCreate(
             aggregates.map(item => dataFactory(item)),
@@ -360,6 +366,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             emptyArrays : false,
         });
 
+        // set auditingRunner to implement DI in model
+        if (updateByIdOptions.auditing) updateByIdOptions.auditing.auditingRunner = this.auditingRunner;
+
         const model = await modelInDB.update(LiteralObject, updateByIdOptions);
 
         this.updatedByIdAggregateHook(aggregate, model);
@@ -400,6 +409,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             emptyArrays : false,
         });
 
+        // set auditingRunner to implement DI in model
+        if (updateOptions.auditing) updateOptions.auditing.auditingRunner = this.auditingRunner;
+
         // execute update statement
         const model = await this.repository.update(
             LiteralObject,
@@ -433,6 +445,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         } = {},
     ): Promise<void>
     {
+        // set auditingRunner to implement DI in model
+        if (upsertOptions.auditing) upsertOptions.auditing.auditingRunner = this.auditingRunner;
+
         // execute update statement
         await this.repository
             .upsert(
@@ -477,6 +492,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
 
+        // set auditingRunner to implement DI in model
+        if (deleteOptions.auditing) deleteOptions.auditing.auditingRunner = this.auditingRunner;
+
         await model.destroy(deleteOptions);
     }
 
@@ -500,6 +518,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             !queryStatement.where ||
             deleteOptions?.allRows
         ) throw new BadRequestException('To delete multiple records, you must define a where statement');
+
+        // set auditingRunner to implement DI in model
+        if (deleteOptions.auditing) deleteOptions.auditing.auditingRunner = this.auditingRunner;
 
         // check that aggregate exist
         await this.repository.destroy(
