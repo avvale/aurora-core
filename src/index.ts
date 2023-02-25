@@ -2,7 +2,6 @@ export * from './core.module';
 export * from './domain/aurora.types';
 export * from './domain/cqrs';
 export * from './domain/decorators';
-export * from './domain/guards';
 export * from './domain/persistence';
 export * from './domain/shared';
 export * from './domain/value-objects';
