@@ -15,9 +15,9 @@ export interface AuditingMeta<T extends AuditingAccount = AuditingAccount>
     userAgent: string;
     method: string;
     baseUrl: string;
-    params: { [key: string]: any };
-    query: { [key: string]: any };
-    body: { [key: string]: any };
+    params: { [key: string]: any; };
+    query: { [key: string]: any; };
+    body: { [key: string]: any; };
     account: T;
     operationId?: string;
     operationSort?: number;
@@ -26,6 +26,19 @@ export interface AuditingMeta<T extends AuditingAccount = AuditingAccount>
     // used to define the id in the rollback action and related to the
     // affected side effects
     id?: string;
+}
+
+export enum AuditingSideEffectEvent
+{
+    CREATED = 'CREATED',
+    BULK_CREATED = 'BULK_CREATED',
+    UPDATED = 'UPDATED',
+    BULK_UPDATED = 'BULK_UPDATED',
+    DELETED = 'DELETED',
+    BULK_DELETED = 'BULK_DELETED',
+    RESTORED = 'RESTORED',
+    BULK_RESTORED = 'BULK_RESTORED',
+    UPSERTED = 'UPSERTED'
 }
 
 export interface CQMetadata
