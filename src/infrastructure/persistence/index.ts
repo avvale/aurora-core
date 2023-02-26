@@ -1,3 +1,4 @@
+export { AuditingRunnerDisabledImplementationService } from './auditing-runner-disabled-implementation.service';
 export * from './mock/mock.repository';
 export * from './mock/mock.seeder';
 export * from './sequelize/sequelize-config.module';

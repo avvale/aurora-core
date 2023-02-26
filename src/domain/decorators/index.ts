@@ -1,5 +1,5 @@
-export * from './auditing.decorator';
-export * from './content-language.decorator';
-export * from './current-account.decorator';
-export * from './permissions.decorator';
-export * from './timezone.decorator';
+export { Auditing } from './auditing.decorator';
+export { ContentLanguage } from './content-language.decorator';
+export { CurrentAccount } from './current-account.decorator';
+export { Permissions } from './permissions.decorator';
+export { Timezone } from './timezone.decorator';
