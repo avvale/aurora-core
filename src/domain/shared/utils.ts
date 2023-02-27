@@ -228,4 +228,17 @@ export class Utils
     {
         return relativePath.join('/');
     }
+
+    public static isValidJson(json: string): boolean
+    {
+        try
+        {
+            JSON.parse(json);
+        }
+        catch (e)
+        {
+            return false;
+        }
+        return true;
+    }
 }
