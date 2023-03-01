@@ -21,7 +21,7 @@ export interface AuditingMeta<T extends AuditingAccount = AuditingAccount>
     account: T;
     operationId?: string;
     operationSort?: number;
-    tags?: string[];
+    tags?: string[] | ((oldValue: any, newValue: any, auditingMeta: AuditingMeta) => string[]);
     // property to define the id that the side effect will be created,
     // used to define the id in the rollback action and related to the
     // affected side effects
