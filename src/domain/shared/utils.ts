@@ -107,6 +107,16 @@ export class Utils
         return false;
     }
 
+    public static arrayGroup<T>(arr: T[], n: number): T[][]
+    {
+        const result: T[][] = [];
+        for (let i = 0; i < arr.length; i += n)
+        {
+            result.push(arr.slice(i, i + n));
+        }
+        return result;
+    }
+
     // map deeply object keys
     public static deepMapKeys(obj, fn): LiteralObject
     {

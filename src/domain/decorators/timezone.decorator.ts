@@ -16,5 +16,5 @@ export const Timezone = createParamDecorator(
         }
 
         return request.header('X-Timezone') ? request.header('X-Timezone') : process.env.TZ;
-    }
+    },
 );
