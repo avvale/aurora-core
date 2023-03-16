@@ -28,6 +28,7 @@
     "uuid-validate": "0.0.3"
   },
   "peerDependencies": {
+    "@apollo/server": "^4.5.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
@@ -36,6 +37,7 @@
     "@nestjs/swagger": "^6.2.1"
   },
   "devDependencies": {
+    "@apollo/server": "^4.5.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
     "@nestjs/core": "^9.0.0",
