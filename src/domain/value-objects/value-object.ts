@@ -39,7 +39,7 @@ export abstract class ValueObject<T> implements IValueObject<T>
         return this._value;
     }
 
-    constructor(dataValue: T | DataValueObject, validationRules: ValidationRules = {}, data: DataValueObject = {})
+    constructor(dataValue: T | DataValueObject, validationRules: ValidationRules = {}, data: DataValueObject | T = {})
     {
         // set default value
         let value = undefined;
@@ -49,9 +49,11 @@ export abstract class ValueObject<T> implements IValueObject<T>
         if (
             dataValue &&
             typeof dataValue === 'object' &&
-            ('haveToEncrypt'    in dataValue ||
-            'currentTimestamp'  in dataValue ||
-            'timezone'          in dataValue)
+            (
+                'haveToEncrypt'    in dataValue ||
+                'currentTimestamp' in dataValue ||
+                'timezone'         in dataValue
+            )
         )
         {
             data = dataValue;
