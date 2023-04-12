@@ -66,10 +66,16 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook when pagination count is done
-    countStatementPaginateHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    countStatementPaginateHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     // hook when compose pagination statement
-    composeStatementPaginateHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    composeStatementPaginateHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     async find(
         {
@@ -105,7 +111,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook when compose find statement
-    composeStatementFindHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    composeStatementFindHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     async findById(
         id: UuidValueObject,
@@ -144,7 +153,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook when compose find by id statement
-    composeStatementFindByIdHook(queryStatement: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    composeStatementFindByIdHook(
+        queryStatement: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     // get multiple records
     async get(
@@ -179,7 +191,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook when compose get statement
-    composeStatementGetHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    composeStatementGetHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     // done rawSQL statement
     async rawSQL(
@@ -193,7 +208,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<Aggregate[]>
     {
         const models = await this.repository.sequelize.query(
-            this.composeStatementRawSQLHook(rawSQL),
+            this.composeStatementRawSQLHook(rawSQL, cQMetadata),
             {
                 ...cQMetadata?.repositoryOptions,
                 type: QueryTypes.SELECT, // can't be overwrite this value, always will be SELECTs for raw sql
@@ -205,7 +220,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook when raw sql is done
-    composeStatementRawSQLHook(rawSQL: string): string { return rawSQL; }
+    composeStatementRawSQLHook(
+        rawSQL: string,
+        cQMetadata?: CQMetadata,
+    ): string { return rawSQL; }
 
     // count records
     async count(
@@ -239,7 +257,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook to add count
-    composeStatementCountHook(queryStatement?: QueryStatement, cQMetadata?: CQMetadata): HookResponse { return { queryStatement, cQMetadata }; }
+    composeStatementCountHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
 
     // ******************
     // ** side effects **
@@ -276,7 +297,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
                     createOptions,
                 );
 
-            this.createdAggregateHook(aggregate, model);
+            this.createdAggregateHook(aggregate, model, createOptions);
         }
         catch (error)
         {
@@ -285,7 +306,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     }
 
     // hook called after create aggregate
-    async createdAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
+    async createdAggregateHook(
+        aggregate: Aggregate,
+        model: Model<ModelClass>,
+        createOptions: LiteralObject,
+    ): Promise<void> { /**/ }
 
     async insert(
         aggregates: Aggregate[],
@@ -318,11 +343,14 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             insertOptions,
         );
 
-        this.insertedAggregateHook(aggregates);
+        this.insertedAggregateHook(aggregates, insertOptions);
     }
 
     // hook called after insert aggregates
-    async insertedAggregateHook(aggregates: Aggregate[]):Promise<void> { /**/ }
+    async insertedAggregateHook(
+        aggregates: Aggregate[],
+        insertOptions: LiteralObject,
+    ):Promise<void> { /**/ }
 
     async updateById(
         aggregate: Aggregate,
@@ -371,11 +399,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const model = await modelInDB.update(LiteralObject, updateByIdOptions);
 
-        this.updatedByIdAggregateHook(aggregate, model);
+        this.updatedByIdAggregateHook(aggregate, model, updateByIdOptions);
     }
 
     // hook called after update by id aggregate
-    async updatedByIdAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
+    async updatedByIdAggregateHook(
+        aggregate: Aggregate,
+        model: Model<ModelClass>,
+        updateByIdOptions: LiteralObject,
+    ): Promise<void> { /**/ }
 
     async update(
         aggregate: Aggregate,
@@ -428,11 +460,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             },
         );
 
-        this.updatedAggregateHook(aggregate, model);
+        this.updatedAggregateHook(aggregate, model, updateOptions);
     }
 
     // hook called after update by id aggregate
-    async updatedAggregateHook(aggregate: Aggregate, model: Model<ModelClass>): Promise<void> { /**/ }
+    async updatedAggregateHook(
+        aggregate: Aggregate,
+        model: Model<ModelClass>,
+        updateOptions: LiteralObject,
+    ): Promise<void> { /**/ }
 
     async upsert(
         aggregate: Aggregate,
@@ -455,11 +491,14 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
                 upsertOptions,
             );
 
-        this.upsertedAggregateHook(aggregate);
+        this.upsertedAggregateHook(aggregate, upsertOptions);
     }
 
     // hook called after upsert aggregates
-    async upsertedAggregateHook(aggregates: Aggregate):Promise<void> { /**/ }
+    async upsertedAggregateHook(
+        aggregates: Aggregate,
+        upsertOptions: LiteralObject,
+    ):Promise<void> { /**/ }
 
     async deleteById(
         id: UuidValueObject,

@@ -32,7 +32,7 @@ export class Utils
         return dayjs().format('YYYY-MM-DD');
     }
 
-    public static dateFromFormat(date: string, format: string): dayjs.Dayjs
+    public static dateFromFormat(date: string, format: string = 'YYYY-MM-DD H:mm:ss'): dayjs.Dayjs
     {
         return dayjs(date, format);
     }
