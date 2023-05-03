@@ -45,6 +45,16 @@ export class Utils
         return generator.digest('hex');
     }
 
+    public static uuid(): string
+    {
+        return uuidv4();
+    }
+
+    static wait(time: number): Promise<void>
+    {
+        return new Promise(resolve => setTimeout(resolve, time));
+    }
+
     public static base64Encode(data: string): string
     {
         return Buffer.from(data).toString('base64');
@@ -210,11 +220,6 @@ export class Utils
             default:
                 return false;
         }
-    }
-
-    public static uuid(): string
-    {
-        return uuidv4();
     }
 
     public static randomString(length: number, chars: string): string
