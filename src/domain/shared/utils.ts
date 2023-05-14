@@ -128,12 +128,23 @@ export class Utils
     }
 
     // map deeply object keys
-    public static deepMapKeys(obj, fn): LiteralObject
+
+    /**
+     * @param obj object to map keys
+     * @param fn function to get key
+     * @param getKeys by default use Reflect.ownKeys to get also non-enumerable properties like Symbols but can use Object.keys too
+     * @returns object with mapped keys
+     */
+    public static deepMapKeys(
+        obj: unknown,
+        fn: (key) => string,
+        getKeys = Reflect.ownKeys,
+    ): LiteralObject
     {
         return Array.isArray(obj)
             ? obj.map(val => Utils.deepMapKeys(val, fn))
             : typeof obj === 'object'
-                ? Object.keys(obj).reduce((acc, current) =>
+                ? getKeys(obj).reduce((acc, current) =>
                 {
                     const key = fn(current);
                     const val = obj[current];
