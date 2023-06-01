@@ -6,7 +6,7 @@ import { QueryStatement } from '../../domain/persistence';
 import * as _ from 'lodash';
 
 @Injectable()
-export class AddI18NConstraintService
+export class AddI18nConstraintService
 {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,

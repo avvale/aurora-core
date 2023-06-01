@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheModule, CACHE_MANAGER } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AddI18NConstraintService } from './add-i18n-constraint.service';
+import { AddI18nConstraintService } from './add-i18n-constraint.service';
 import { FormatLangCode } from '../../domain/aurora.types';
 
 const langs = [
@@ -11,9 +11,9 @@ const langs = [
     { id: '47ecef11-3d7d-426b-967d-31f2f737b65c', name: 'Français',  image: 'fr', iso6392: 'fr', iso6393: 'fra', ietf: 'fr-FR', customCode: null, dir: 'RTL', sort: 0, isActive: false },
 ];
 
-describe('AddI18NConstraintService', () =>
+describe('AddI18nConstraintService', () =>
 {
-    let service: AddI18NConstraintService;
+    let service: AddI18nConstraintService;
 
     beforeAll(async () =>
     {
@@ -22,7 +22,7 @@ describe('AddI18NConstraintService', () =>
                 CacheModule.register()
             ],
             providers: [
-                AddI18NConstraintService,
+                AddI18nConstraintService,
                 {
                     provide : CACHE_MANAGER,
                     useValue: {
@@ -38,12 +38,12 @@ describe('AddI18NConstraintService', () =>
             ]
         }).compile();
 
-        service = module.get<AddI18NConstraintService>(AddI18NConstraintService);
+        service = module.get<AddI18nConstraintService>(AddI18nConstraintService);
     });
 
     describe('main', () =>
     {
-        test('AddI18NConstraintService should be defined', () =>
+        test('AddI18nConstraintService should be defined', () =>
         {
             expect(service).toBeDefined();
         });
