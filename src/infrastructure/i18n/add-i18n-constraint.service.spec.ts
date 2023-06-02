@@ -26,16 +26,16 @@ describe('AddI18nConstraintService', () =>
                 {
                     provide : CACHE_MANAGER,
                     useValue: {
-                        get: (key: string) => key === 'common/lang' ? langs : null,
-                    }
+                        get: (key: string) => key === 'common/langs' ? langs : null,
+                    },
                 },
                 {
                     provide : ConfigService,
                     useValue: {
                         get: (key: string) => key === 'APP_LANG' ? 'es' : '',
-                    }
+                    },
                 },
-            ]
+            ],
         }).compile();
 
         service = module.get<AddI18nConstraintService>(AddI18nConstraintService);

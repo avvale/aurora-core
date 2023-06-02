@@ -10,21 +10,22 @@ export class AddI18nConstraintService
 {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
-        private readonly configService: ConfigService
+        private readonly configService: ConfigService,
     ) {}
 
+    // method that adds the constraint of i18n to the query
     public async main(
         constraint: QueryStatement,
         i18NRelation: string,
         contentLanguage: string,
         {
             contentLanguageFormat = FormatLangCode.ISO6392,
-            defineDefaultLanguage = true
+            defineDefaultLanguage = true,
         }: {
             contentLanguageFormat?: FormatLangCode;
             defineDefaultLanguage?: boolean;
 
-        } = {}
+        } = {},
     ): Promise<QueryStatement>
     {
         // if contentLanguage is *, return all languages records
@@ -34,9 +35,9 @@ export class AddI18nConstraintService
                 include: [{
                     association: i18NRelation,
                     required   : true,
-                }]
+                }],
             },
-            constraint
+            constraint,
         );
 
         // get langs from cache manager, previous loaded in common module in onApplicationBootstrap hook
@@ -45,7 +46,7 @@ export class AddI18nConstraintService
             iso6392: string;
             iso6393: string;
             ietf: string;
-        }[] = await this.cacheManager.get('common/lang') || [];
+        }[] = await this.cacheManager.get('common/langs') || [];
 
         let lang = langs.find(lang => lang[contentLanguageFormat] === contentLanguage);
         if (!lang && defineDefaultLanguage) lang = langs.find(lang => lang[FormatLangCode.ISO6392] === this.configService.get<string>('APP_LANG'));
@@ -60,10 +61,10 @@ export class AddI18nConstraintService
                     association: i18NRelation,
                     required   : true,
                     // add lang constrain if is defined
-                    where      : lang ? { langId: lang.id } : undefined
-                }]
+                    where      : lang ? { langId: lang.id } : undefined,
+                }],
             },
-            constraint
+            constraint,
         );
     }
 }
