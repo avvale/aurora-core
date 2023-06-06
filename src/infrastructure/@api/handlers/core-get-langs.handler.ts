@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable } from '@nestjs/common';
-import { Cache } from 'cache-manager';
-import { CoreLangService } from '../../../domain/services/core-get-langs.service';
+import { Injectable } from '@nestjs/common';
+import { CoreGetLangsService } from '../../../domain';
 
 @Injectable()
 export class CoreGetLangsHandler
 {
     constructor(
-        private readonly coreLangService: CoreLangService,
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly coreGetLangsService: CoreGetLangsService,
     ) {}
 
     async main()
     {
-        return await this.coreLangService.get();
+        return await this.coreGetLangsService.get();
     }
 }
