@@ -6,7 +6,7 @@ export * from './domain/functions';
 export * from './domain/persistence';
 export * from './domain/shared';
 export * from './domain/value-objects';
-export * from './infrastructure/controllers';
+export * from './infrastructure/@api/controllers';
 export * from './infrastructure/cqrs';
 export * from './infrastructure/graphql';
 export * from './infrastructure/guards';

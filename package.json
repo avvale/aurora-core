@@ -18,9 +18,10 @@
     "pack": "npm pack && cp $(node -p \"p=require('./package.json');p.name+'-'+p.version+'.tgz'\") ../aurora-app/aurora-ts-core.tgz && npm install ../aurora-app/aurora-ts-core.tgz --prefix ../aurora-app && rm -f $(node -p \"p=require('./package.json');p.name+'-'+p.version+'.tgz'\")"
   },
   "dependencies": {
+    "@nestjs/cache-manager": "^1.0.0",
     "@nestjs/sequelize": "^9.0.0",
     "bcrypt": "^5.1.0",
-    "cache-manager": "^5.1.7",
+    "cache-manager": "^5.2.2",
     "clean-deep": "^3.4.0",
     "dayjs": "^1.11.7",
     "sequelize": "^6.29.3",
