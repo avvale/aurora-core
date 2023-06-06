@@ -1,15 +1,14 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Controller, Get, Inject } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { Cache } from 'cache-manager';
+import { CoreGetLangsHandler } from '../handlers';
 
 @ApiTags('[core] langs')
 @Controller('core/langs')
-export class CoreLangsController
+export class CoreGetLangsController
 {
     constructor(
-        @Inject(CACHE_MANAGER) private cacheManager: Cache,
+        private readonly handler: CoreGetLangsHandler,
     ) {}
 
     @Get()
@@ -17,8 +16,6 @@ export class CoreLangsController
     @ApiCreatedResponse({ description: 'The record has been successfully returned.' })
     async main()
     {
-        const langs = await this.cacheManager.get('common/langs');
-
-        return langs;
+        return await this.handler.main();
     }
 }

@@ -32,3 +32,8 @@ type Pagination
     "Query object data"
     rows: [JSON]!
 }
+
+type Query
+{
+    coreGetLangs(): Any!
+}
