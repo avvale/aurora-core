@@ -29,6 +29,7 @@ export class AddI18nConstraintService
     ): Promise<QueryStatement>
     {
         // if contentLanguage is *, return all languages records
+        // value from content-language header
         if (contentLanguage === '*') return _.merge(
             {},
             {
@@ -40,7 +41,8 @@ export class AddI18nConstraintService
             constraint,
         );
 
-        // get langs from cache manager, previous loaded in common module in onApplicationBootstrap hook
+        // get langs from cache manager, previously
+        // loaded in coreGetLangs service
         const langs: {
             id: string;
             iso6392: string;
@@ -48,11 +50,21 @@ export class AddI18nConstraintService
             ietf: string;
         }[] = await this.cacheManager.get('common/langs') || [];
 
+        // try get lang from content-language header
         let lang = langs.find(lang => lang[contentLanguageFormat] === contentLanguage);
-        if (!lang && defineDefaultLanguage) lang = langs.find(lang => lang[FormatLangCode.ISO6392] === this.configService.get<string>('APP_LANG'));
 
-        // error if lang is not defined
-        if (!lang && defineDefaultLanguage) throw new InternalServerErrorException('APP_LANG must be defined in iso6392 lang code format in .env file, not found contentLanguage: ', contentLanguage);
+        // if lang is not defined, try get lang from APP_FALLBACK_LANG env variable
+        // to get object from this lang
+        if (!lang && defineDefaultLanguage)
+        {
+            lang = langs.find(lang => lang[FormatLangCode.ISO6392] === this.configService.get<string>('APP_FALLBACK_LANG'));
+        }
+
+        // error if lang is not defined and should be defined default language APP_FALLBACK_LANG
+        if (!lang && defineDefaultLanguage)
+        {
+            throw new InternalServerErrorException('APP_FALLBACK_LANG must be defined in iso6392 lang code format in .env file, not found contentLanguage: ', contentLanguage);
+        }
 
         return _.merge(
             {},

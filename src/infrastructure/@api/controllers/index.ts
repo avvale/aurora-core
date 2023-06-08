@@ -1,4 +1,4 @@
-export * from './core-environment-information.controller';
-export * from './core-get-langs.controller';
-export * from './core-preparation-request.controller';
-export * from './core-status.controller';
+export { CoreEnvironmentInformationController } from './core-environment-information.controller';
+export { CoreGetLangsController } from './core-get-langs.controller';
+export { CorePreparationRequestController } from './core-preparation-request.controller';
+export { CoreStatusController } from './core-status.controller';
