@@ -15,6 +15,6 @@ export const ContentLanguage = createParamDecorator(
             request = context.switchToHttp().getRequest();
         }
 
-        return request.headers['content-language'];
+        return request.headers['Content-Language'];
     },
 );
