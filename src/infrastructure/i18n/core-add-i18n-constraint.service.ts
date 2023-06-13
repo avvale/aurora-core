@@ -6,7 +6,7 @@ import { QueryStatement } from '../../domain/persistence';
 import * as _ from 'lodash';
 
 @Injectable()
-export class AddI18nConstraintService
+export class CoreAddI18nConstraintService
 {
     constructor(
         @Inject(CACHE_MANAGER) private cacheManager: Cache,
@@ -14,7 +14,7 @@ export class AddI18nConstraintService
     ) {}
 
     // method that adds the constraint of i18n to the query
-    public async main(
+    public async add(
         constraint: QueryStatement,
         i18NRelation: string,
         contentLanguage: string,

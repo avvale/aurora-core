@@ -2,7 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheModule, CACHE_MANAGER } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { AddI18nConstraintService } from './add-i18n-constraint.service';
+import { CoreAddI18nConstraintService } from './core-add-i18n-constraint.service';
 import { CoreSearchKeyLang } from '../../domain/aurora.types';
 
 const langs = [
@@ -12,9 +12,9 @@ const langs = [
     { id: '47ecef11-3d7d-426b-967d-31f2f737b65c', name: 'Français',  image: 'fr', iso6392: 'fr', iso6393: 'fra', ietf: 'fr-FR', customCode: null, dir: 'RTL', sort: 0, isActive: false },
 ];
 
-describe('AddI18nConstraintService', () =>
+describe('CoreAddI18nConstraintService', () =>
 {
-    let service: AddI18nConstraintService;
+    let service: CoreAddI18nConstraintService;
 
     beforeAll(async () =>
     {
@@ -23,7 +23,7 @@ describe('AddI18nConstraintService', () =>
                 CacheModule.register(),
             ],
             providers: [
-                AddI18nConstraintService,
+                CoreAddI18nConstraintService,
                 {
                     provide : CACHE_MANAGER,
                     useValue: {
@@ -39,19 +39,19 @@ describe('AddI18nConstraintService', () =>
             ],
         }).compile();
 
-        service = module.get<AddI18nConstraintService>(AddI18nConstraintService);
+        service = module.get<CoreAddI18nConstraintService>(CoreAddI18nConstraintService);
     });
 
     describe('main', () =>
     {
-        test('AddI18nConstraintService should be defined', () =>
+        test('CoreAddI18nConstraintService should be defined', () =>
         {
             expect(service).toBeDefined();
         });
 
         test('should return a QueryStatement with uuid lang pass by parameter', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a', { searchKeyLang: CoreSearchKeyLang.ID })).toEqual({
+            expect(await service.add({}, 'i18NRelation', '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a', { searchKeyLang: CoreSearchKeyLang.ID })).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
@@ -66,7 +66,7 @@ describe('AddI18nConstraintService', () =>
 
         test('should return a QueryStatement with iso6392 lang pass by parameter', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', 'es')).toEqual({
+            expect(await service.add({}, 'i18NRelation', 'es')).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
@@ -81,7 +81,7 @@ describe('AddI18nConstraintService', () =>
 
         test('should return a QueryStatement with iso6392 lang pass by parameter', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', 'en')).toEqual({
+            expect(await service.add({}, 'i18NRelation', 'en')).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
@@ -96,7 +96,7 @@ describe('AddI18nConstraintService', () =>
 
         test('should return a QueryStatement with undefined lang pass by parameter and take default lang', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', 'xx')).toEqual({
+            expect(await service.add({}, 'i18NRelation', 'xx')).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
@@ -111,7 +111,7 @@ describe('AddI18nConstraintService', () =>
 
         test('should return a QueryStatement without lang constraint', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', '*')).toEqual({
+            expect(await service.add({}, 'i18NRelation', '*')).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
