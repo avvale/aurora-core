@@ -33,10 +33,12 @@ export class AddI18nConstraintService
         if (contentLanguage === '*') return _.merge(
             {},
             {
-                include: [{
-                    association: i18NRelation,
-                    required   : true,
-                }],
+                include: [
+                    {
+                        association: i18NRelation,
+                        required   : true,
+                    },
+                ],
             },
             constraint,
         );
@@ -69,12 +71,14 @@ export class AddI18nConstraintService
         return _.merge(
             {},
             {
-                include: [{
-                    association: i18NRelation,
-                    required   : true,
-                    // add lang constrain if is defined
-                    where      : lang ? { langId: lang.id } : undefined,
-                }],
+                include: [
+                    {
+                        association: i18NRelation,
+                        required   : true,
+                        // add lang constrain if is defined
+                        where      : lang ? { langId: lang.id } : undefined,
+                    },
+                ],
             },
             constraint,
         );
