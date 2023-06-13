@@ -41,6 +41,14 @@ export enum AuditingSideEffectEvent
     UPSERTED = 'UPSERTED'
 }
 
+export enum CoreSearchKeyLang
+{
+    ID = 'id',
+    IETF = 'ietf',
+    ISO6392 = 'iso6392',
+    ISO6393 = 'iso6393',
+}
+
 export interface CQMetadata
 {
     timezone?: string;
@@ -54,14 +62,6 @@ export interface DataValueObject
     currentDate?: boolean;
     addTimezone?: string;
     removeTimezone?: string;
-}
-
-export enum FormatLangCode
-{
-    ID = 'id',
-    IETF = 'ietf',
-    ISO6392 = 'iso6392',
-    ISO6393 = 'iso6393',
 }
 
 export interface HookResponse

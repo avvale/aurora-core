@@ -1,7 +1,7 @@
 import { CACHE_MANAGER, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { FormatLangCode } from '../../domain/aurora.types';
+import { CoreSearchKeyLang } from '../../domain/aurora.types';
 import { QueryStatement } from '../../domain/persistence';
 import * as _ from 'lodash';
 
@@ -19,10 +19,10 @@ export class AddI18nConstraintService
         i18NRelation: string,
         contentLanguage: string,
         {
-            contentLanguageFormat = FormatLangCode.ISO6392,
+            searchKeyLang = CoreSearchKeyLang.ISO6392,
             defineDefaultLanguage = true,
         }: {
-            contentLanguageFormat?: FormatLangCode;
+            searchKeyLang?: CoreSearchKeyLang;
             defineDefaultLanguage?: boolean;
 
         } = {},
@@ -51,13 +51,13 @@ export class AddI18nConstraintService
         }[] = await this.cacheManager.get('common/langs') || [];
 
         // try get lang from content-language header
-        let lang = langs.find(lang => lang[contentLanguageFormat] === contentLanguage);
+        let lang = langs.find(lang => lang[searchKeyLang] === contentLanguage);
 
         // if lang is not defined, try get lang from APP_FALLBACK_LANG env variable
         // to get object from this lang
         if (!lang && defineDefaultLanguage)
         {
-            lang = langs.find(lang => lang[FormatLangCode.ISO6392] === this.configService.get<string>('APP_FALLBACK_LANG'));
+            lang = langs.find(lang => lang[CoreSearchKeyLang.ISO6392] === this.configService.get<string>('APP_FALLBACK_LANG'));
         }
 
         // error if lang is not defined and should be defined default language APP_FALLBACK_LANG

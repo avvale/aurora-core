@@ -1,12 +1,13 @@
+/* eslint-disable max-len */
 import { Test, TestingModule } from '@nestjs/testing';
 import { CacheModule, CACHE_MANAGER } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AddI18nConstraintService } from './add-i18n-constraint.service';
-import { FormatLangCode } from '../../domain/aurora.types';
+import { CoreSearchKeyLang } from '../../domain/aurora.types';
 
 const langs = [
     { id: '94c893c1-3eb7-4f22-a878-b405c6d42e09', name: 'Deutsch',   image: 'de', iso6392: 'de', iso6393: 'deu', ietf: 'de-DE', customCode: null, dir: 'RTL', sort: 0, isActive: false },
-    { id: '7c4754e7-3363-48ca-af99-632522226b51', name: 'English',   image: 'gb', iso6392: 'en', iso6393: 'eng', ietf: 'en-US', customCode: null, dir: 'RTL', sort: 0, isActive: false },
+    { id: '7c4754e7-3363-48ca-af99-632522226b51', name: 'English',   image: 'us', iso6392: 'en', iso6393: 'eng', ietf: 'en-US', customCode: null, dir: 'RTL', sort: 0, isActive: false },
     { id: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a', name: 'Español',   image: 'es', iso6392: 'es', iso6393: 'spa', ietf: 'es-ES', customCode: null, dir: 'RTL', sort: 1, isActive: true  },
     { id: '47ecef11-3d7d-426b-967d-31f2f737b65c', name: 'Français',  image: 'fr', iso6392: 'fr', iso6393: 'fra', ietf: 'fr-FR', customCode: null, dir: 'RTL', sort: 0, isActive: false },
 ];
@@ -19,7 +20,7 @@ describe('AddI18nConstraintService', () =>
     {
         const module: TestingModule = await Test.createTestingModule({
             imports: [
-                CacheModule.register()
+                CacheModule.register(),
             ],
             providers: [
                 AddI18nConstraintService,
@@ -50,16 +51,16 @@ describe('AddI18nConstraintService', () =>
 
         test('should return a QueryStatement with uuid lang pass by parameter', async () =>
         {
-            expect(await service.main({}, 'i18NRelation', '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a', { contentLanguageFormat: FormatLangCode.ID })).toEqual({
+            expect(await service.main({}, 'i18NRelation', '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a', { searchKeyLang: CoreSearchKeyLang.ID })).toEqual({
                 include: [
                     {
                         association: 'i18NRelation',
                         required   : true,
                         where      : {
-                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a'
-                        }
-                    }
-                ]
+                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a',
+                        },
+                    },
+                ],
             });
         });
 
@@ -71,10 +72,10 @@ describe('AddI18nConstraintService', () =>
                         association: 'i18NRelation',
                         required   : true,
                         where      : {
-                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a'
-                        }
-                    }
-                ]
+                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a',
+                        },
+                    },
+                ],
             });
         });
 
@@ -86,10 +87,10 @@ describe('AddI18nConstraintService', () =>
                         association: 'i18NRelation',
                         required   : true,
                         where      : {
-                            langId: '7c4754e7-3363-48ca-af99-632522226b51'
-                        }
-                    }
-                ]
+                            langId: '7c4754e7-3363-48ca-af99-632522226b51',
+                        },
+                    },
+                ],
             });
         });
 
@@ -101,10 +102,10 @@ describe('AddI18nConstraintService', () =>
                         association: 'i18NRelation',
                         required   : true,
                         where      : {
-                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a'
-                        }
-                    }
-                ]
+                            langId: '4470b5ab-9d57-4c9d-a68f-5bf8e32f543a',
+                        },
+                    },
+                ],
             });
         });
 
@@ -115,8 +116,8 @@ describe('AddI18nConstraintService', () =>
                     {
                         association: 'i18NRelation',
                         required   : true,
-                    }
-                ]
+                    },
+                ],
             });
         });
     });
