@@ -55,7 +55,7 @@ export class CoreAddI18nConstraintService
         // try get lang from content-language header
         let lang = langs.find(lang => lang[searchKeyLang] === contentLanguage);
 
-        // if lang is not defined, try get lang from APP_FALLBACK_LANG env variable
+        // if lang is not defined, try get lang from APP_FALLBACK_LANG .env variable
         // to get object from this lang
         if (!lang && defineDefaultLanguage)
         {
