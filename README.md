@@ -1,2 +1,2 @@
-aurora-ts-core
-=============
+@aurorajs.dev/core
+==================
