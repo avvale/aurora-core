@@ -1,5 +1,5 @@
 import { LiteralObject } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';
@@ -45,8 +45,14 @@ export class Utils
         return generator.digest('hex');
     }
 
-    public static uuid(): string
+    public static uuid(seed?: string): string
     {
+        if (seed)
+        {
+            const uuidSpaceName = '3eb6ecd7-2f06-4d41-934c-3f813c96982a';
+            return uuidv5(seed, uuidSpaceName);
+        }
+
         return uuidv4();
     }
 
