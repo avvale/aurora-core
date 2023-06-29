@@ -1,8 +1,3 @@
-declare interface Array<T>
-{
-    removeItem(value: T): Array<T>;
-}
-
 Array.prototype.removeItem = function <T>(value: T): Array<T>
 {
     const index = this.indexOf(value);
