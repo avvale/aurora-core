@@ -1,4 +1,3 @@
-import { LiteralObject } from '@nestjs/common';
 import { QueryStatement } from './persistence/sql-statement/sql-statement';
 import { AuditingRunner } from './persistence/auditing-runner';
 
@@ -80,6 +79,11 @@ export interface Jwt
     nbf: number;            // token accepted not before this timestamp
     exp: number|null;       // timestamp when expired this token
     scopes?: string;        // scope that belong client
+}
+
+export interface LiteralObject
+{
+    [key: string]: any;
 }
 
 export interface MapperOptions

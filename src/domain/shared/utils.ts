@@ -1,5 +1,5 @@
-import { LiteralObject } from '@nestjs/common';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
+import { LiteralObject } from '../aurora.types';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 import * as path from 'path';

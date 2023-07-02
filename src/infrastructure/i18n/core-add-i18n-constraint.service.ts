@@ -1,4 +1,5 @@
-import { CACHE_MANAGER, Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 import { CoreSearchKeyLang } from '../../domain/aurora.types';

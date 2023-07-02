@@ -1,7 +1,6 @@
-import { LiteralObject } from '@nestjs/common';
 import { QueryStatement } from './sql-statement/sql-statement';
 import { ValueObject } from '../value-objects/value-object';
-import { CQMetadata } from '../aurora.types';
+import { CQMetadata, LiteralObject } from '../aurora.types';
 import { Pagination } from '../shared/pagination';
 
 export interface IRepository<Aggregate>

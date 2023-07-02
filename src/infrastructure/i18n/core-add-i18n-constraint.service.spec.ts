@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
+import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
-import { CacheModule, CACHE_MANAGER } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { CoreAddI18nConstraintService } from './core-add-i18n-constraint.service';
 import { CoreSearchKeyLang } from '../../domain/aurora.types';

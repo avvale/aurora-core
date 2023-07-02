@@ -1,8 +1,8 @@
-import { ConflictException, NotFoundException, BadRequestException, LiteralObject } from '@nestjs/common';
+import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
 import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
-import { CQMetadata, HookResponse } from '../../../domain/aurora.types';
+import { CQMetadata, HookResponse, LiteralObject } from '../../../domain/aurora.types';
 import { AuditingRunner, ICriteria, IRepository } from '../../../domain';
 import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';

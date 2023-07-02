@@ -1,6 +1,6 @@
-import { LiteralObject } from '@nestjs/common';
-import { UuidValueObject } from '../value-objects/uuid.value-object';
+import { LiteralObject } from '../aurora.types';
 import { TimestampValueObject } from '../value-objects/timestamp.value-object';
+import { UuidValueObject } from '../value-objects/uuid.value-object';
 
 export interface AggregateBase
 {
