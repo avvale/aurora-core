@@ -1,14 +1,15 @@
+import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
+import * as dayjs from 'dayjs';
+import * as advancedFormat from 'dayjs/plugin/advancedFormat';
+import * as timezone from 'dayjs/plugin/timezone';
+import * as utc from 'dayjs/plugin/utc';
+import * as _ from 'lodash';
+import * as mime from 'mime';
+import { createWriteStream, unlink } from 'node:fs';
+import * as path from 'path';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 import { LiteralObject } from '../aurora.types';
-import * as crypto from 'crypto';
-import * as bcrypt from 'bcrypt';
-import * as path from 'path';
-import * as mime from 'mime';
-import * as utc from 'dayjs/plugin/utc';
-import * as timezone from 'dayjs/plugin/timezone';
-import * as advancedFormat from 'dayjs/plugin/advancedFormat';
-import * as dayjs from 'dayjs';
-import * as _ from 'lodash';
 declare const Buffer: any;
 
 dayjs.extend(utc);
@@ -272,5 +273,40 @@ export class Utils
             return false;
         }
         return true;
+    }
+
+    /**
+     * @param path path to save file
+     * @param stream stream to save
+     * @returns Promise
+     */
+    public static storageStream(path: string | URL, stream: any): Promise<unknown>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            // Create a stream to which the upload will be written.
+            const writeStream = createWriteStream(path);
+
+            // When the upload is fully written, resolve the promise.
+            writeStream.on('finish', resolve);
+
+            // If there's an error writing the file, remove the partially written file
+            // and reject the promise.
+            writeStream.on('error', error =>
+            {
+                unlink(path, () =>
+                {
+                    reject(error);
+                });
+            });
+
+            // In Node.js <= v13, errors are not automatically propagated between piped
+            // streams. If there is an error receiving the upload, destroy the write
+            // stream with the corresponding error.
+            stream.on('error', error => writeStream.destroy(error));
+
+            // Pipe the upload into the write stream.
+            stream.pipe(writeStream);
+        });
     }
 }
