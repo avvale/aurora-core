@@ -1,25 +1,32 @@
 import { Scalar, CustomScalar } from '@nestjs/graphql';
-// import GraphQLUpload from 'graphql-upload/GraphQLUpload.mjs';
-// const { default: graphqlUploadExpress } = await import('graphql-upload/graphqlUploadExpress.mjs');
 
 @Scalar('Upload', type => UploadScalar)
 export class UploadScalar implements CustomScalar<any, any>
 {
     description = 'Upload custom scalar type';
 
-    parseValue(value: any): any
+    async parseValue(value: any): Promise<any>
     {
-
-        return; //GraphQLUpload.parseValue(value);
+        const GraphQLUpload = await this.importGraphQLUpload();
+        return GraphQLUpload.parseValue(value);
     }
 
-    serialize(value: any): any
+    async serialize(value: any): Promise<any>
     {
-        return; // GraphQLUpload.serialize(value);
+        const GraphQLUpload = await this.importGraphQLUpload();
+        return GraphQLUpload.serialize(value);
     }
 
-    parseLiteral(ast: any): any
+    async parseLiteral(ast: any): Promise<any>
     {
-        return; // GraphQLUpload.parseLiteral(ast, null);
+        const GraphQLUpload = await this.importGraphQLUpload();
+        return GraphQLUpload.parseLiteral(ast, null);
+    }
+
+    private async importGraphQLUpload(): Promise<typeof import('graphql-upload/GraphQLUpload.mjs')>
+    {
+        const { default: GraphQLUpload } = await (eval('import(\'graphql-upload/GraphQLUpload.mjs\')') as Promise<typeof import('graphql-upload/GraphQLUpload.mjs')>);
+
+        return GraphQLUpload;
     }
 }
