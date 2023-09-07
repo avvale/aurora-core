@@ -31,6 +31,7 @@ export interface IRepository<Aggregate>
         options?: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            findArguments?: LiteralObject;
         }
     ): Promise<Aggregate | null>;
 
@@ -123,6 +124,7 @@ export interface IRepository<Aggregate>
             deleteOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            findArguments?: LiteralObject;
         }
     ): Promise<void>;
 

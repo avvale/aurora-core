@@ -117,13 +117,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): HookResponse { return { queryStatement, cQMetadata }; }
 
     async findById(
-        id: UuidValueObject,
+        id: UuidValueObject | undefined,
         {
             constraint = {},
             cQMetadata = undefined,
+            findArguments = undefined,
         }: {
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            findArguments?: LiteralObject;
         } = {},
     ): Promise<Aggregate>
     {
@@ -131,9 +133,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const hookResponse = this.composeStatementFindByIdHook(
             this.criteria.mergeQueryConstraintStatement(
                 {
-                    where: {
-                        id: id.value,
-                    },
+                    where: id
+                        ? { id: id.value }
+                        : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
                 },
                 constraint,
             ),
@@ -501,15 +503,17 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ):Promise<void> { /**/ }
 
     async deleteById(
-        id: UuidValueObject,
+        id: UuidValueObject | undefined,
         {
             deleteOptions = undefined,
             constraint = {},
             cQMetadata = undefined,
+            findArguments = undefined,
         }: {
             deleteOptions?: LiteralObject;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
+            findArguments?: LiteralObject;
         } = {},
     ): Promise<void>
     {
@@ -519,9 +523,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             this.criteria.implements(
                 this.criteria.mergeQueryConstraintStatement(
                     {
-                        where: {
-                            id: id.value,
-                        },
+                        where: id
+                            ? { id: id.value }
+                            : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
                     },
                     constraint,
                 ),
