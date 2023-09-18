@@ -1,10 +1,9 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
 import { CoreSearchKeyLang } from '../../domain/aurora.types';
 import { QueryStatement } from '../../domain/persistence';
-import * as _ from 'lodash';
 
 @Injectable()
 export class CoreAddI18nConstraintService
@@ -29,20 +28,22 @@ export class CoreAddI18nConstraintService
         } = {},
     ): Promise<QueryStatement>
     {
+        const include = constraint.include || [];
+
         // if contentLanguage is *, return all languages records
         // value from content-language header
-        if (contentLanguage === '*') return _.merge(
-            {},
-            {
-                include: [
-                    {
-                        association: i18NRelation,
-                        required   : true,
-                    },
-                ],
-            },
-            constraint,
-        );
+        if (contentLanguage === '*')
+        {
+            constraint.include = [
+                ...include,
+                {
+                    association: i18NRelation,
+                    required   : true,
+                },
+            ];
+
+            return constraint;
+        }
 
         // get langs from cache manager, previously
         // loaded in coreGetLangs service
@@ -69,19 +70,17 @@ export class CoreAddI18nConstraintService
             throw new InternalServerErrorException('APP_FALLBACK_LANG must be defined in iso6392 lang code format in .env file, not found contentLanguage: ', contentLanguage);
         }
 
-        return _.merge(
-            {},
+
+        constraint.include = [
+            ...include,
             {
-                include: [
-                    {
-                        association: i18NRelation,
-                        required   : true,
-                        // add lang constrain if is defined
-                        where      : lang ? { langId: lang.id } : undefined,
-                    },
-                ],
+                association: i18NRelation,
+                required   : true,
+                // add lang constrain if is defined
+                where      : lang ? { langId: lang.id } : undefined,
             },
-            constraint,
-        );
+        ];
+
+        return constraint;
     }
 }
