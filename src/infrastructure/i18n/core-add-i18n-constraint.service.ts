@@ -34,13 +34,17 @@ export class CoreAddI18nConstraintService
         // value from content-language header
         if (contentLanguage === '*')
         {
-            constraint.include = [
-                ...include,
-                {
-                    association: i18NRelation,
-                    required   : true,
-                },
-            ];
+            // if i18n relation is already included, don't include again
+            if (!include.some(include => include.association === i18NRelation))
+            {
+                constraint.include = [
+                    ...include,
+                    {
+                        association: i18NRelation,
+                        required   : true,
+                    },
+                ];
+            }
 
             return constraint;
         }
@@ -70,16 +74,18 @@ export class CoreAddI18nConstraintService
             throw new InternalServerErrorException('APP_FALLBACK_LANG must be defined in iso6392 lang code format in .env file, not found contentLanguage: ', contentLanguage);
         }
 
-
-        constraint.include = [
-            ...include,
-            {
-                association: i18NRelation,
-                required   : true,
-                // add lang constrain if is defined
-                where      : lang ? { langId: lang.id } : undefined,
-            },
-        ];
+        if (!include.some(include => include.association === i18NRelation))
+        {
+            constraint.include = [
+                ...include,
+                {
+                    association: i18NRelation,
+                    required   : true,
+                    // add lang constrain if is defined
+                    where      : lang ? { langId: lang.id } : undefined,
+                },
+            ];
+        }
 
         return constraint;
     }
