@@ -28,6 +28,8 @@ export class CoreAddI18nConstraintService
         } = {},
     ): Promise<QueryStatement>
     {
+        if (!constraint) constraint = {};
+
         const include = constraint.include || [];
 
         // if contentLanguage is *, return all languages records
