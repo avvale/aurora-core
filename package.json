@@ -23,6 +23,7 @@
     "cache-manager": "^5.2.3",
     "clean-deep": "^3.4.0",
     "dayjs": "^1.11.9",
+    "nanoid": "^3.3.6",
     "sequelize": "^6.32.1",
     "sequelize-typescript": "^2.1.5",
     "uuid-validate": "0.0.3"

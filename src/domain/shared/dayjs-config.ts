@@ -8,7 +8,7 @@ export function setTimeZoneApplication(configService: ConfigService, dayjs): voi
         throw new InternalServerErrorException('APP_TIMEZONE variable is not defined in environment file');
 
     // check valid timezone in environment file
-    if (!dayjs().tz(configService.get<string>('APP_TIMEZONE'))) 
+    if (!dayjs().tz(configService.get<string>('APP_TIMEZONE')))
         throw new InternalServerErrorException(`APP_TIMEZONE environment value has an incorrect value: ${configService.get<string>('APP_TIMEZONE')}`);
 
     // set data source timezone for application

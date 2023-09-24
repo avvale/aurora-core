@@ -6,6 +6,7 @@ import * as timezone from 'dayjs/plugin/timezone';
 import * as utc from 'dayjs/plugin/utc';
 import * as _ from 'lodash';
 import * as mime from 'mime';
+import { nanoid } from 'nanoid';
 import { createWriteStream, unlink } from 'node:fs';
 import * as path from 'path';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
@@ -55,6 +56,11 @@ export class Utils
         }
 
         return uuidv4();
+    }
+
+    public static nanoid(): string
+    {
+        return nanoid();
     }
 
     static wait(time: number): Promise<void>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 declare interface String
 {
     toCamelCase(this: string): string;
