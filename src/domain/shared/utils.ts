@@ -315,4 +315,64 @@ export class Utils
             stream.pipe(writeStream);
         });
     }
+
+    /*
+    review this method
+    public static findKeyPath (ob: LiteralObject, key: string): string
+    {
+        const path = [];
+        const keyExists = obj =>
+        {
+            if (!obj || (typeof obj !== 'object' && !Array.isArray(obj)))
+            {
+                return false;
+            }
+            else if (obj.hasOwnProperty(key))
+            {
+                return true;
+            }
+            else if (Array.isArray(obj))
+            {
+                const parentKey = path.length ? path.pop() : '';
+
+                for (let i = 0; i < obj.length; i++)
+                {
+                    path.push(`${parentKey}[${i}]`);
+                    const result = keyExists(obj[i]);
+                    if (result)
+                    {
+                        return result;
+                    }
+                    path.pop();
+                }
+            }
+            else
+            {
+                for (const k in obj)
+                {
+                    if ((<any>Object).values(Operator).includes(k))
+                    {
+                        path.push(`['${k}']`);
+                    }
+                    else
+                    {
+                        path.push(k);
+                    }
+
+                    const result = keyExists(obj[k]);
+                    if (result)
+                    {
+                        return result;
+                    }
+                    path.pop();
+                }
+            }
+            return false;
+        };
+
+        keyExists(ob);
+
+        return path.join('.');
+    }
+*/
 }

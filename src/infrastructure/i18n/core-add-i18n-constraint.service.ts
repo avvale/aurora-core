@@ -83,7 +83,7 @@ export class CoreAddI18nConstraintService
                 {
                     association: i18NRelation,
                     required   : true,
-                    // add lang constrain if is defined
+                    // add lang constrain if is defined to ger only records with this lang
                     where      : lang ? { langId: lang.id } : undefined,
                 },
             ];
