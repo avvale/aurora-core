@@ -1,1 +1,3 @@
-export const storagePublicAbsoluteURL = (): string => `${process.env.STORAGE_URL}/${process.env.STORAGE_PUBLIC_PATH}`;
+import { storagePublicAbsoluteDirectoryURL } from './storage-public-absolute-directory-url.function';
+
+export const storagePublicAbsoluteURL = (relativePathSegments: string[], filename: string): string => `${storagePublicAbsoluteDirectoryURL(relativePathSegments)}/${filename}`;
