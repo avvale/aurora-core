@@ -2,13 +2,13 @@ import { QueryStatement } from '..';
 
 export const addRelationshipInclude = (
     query: QueryStatement,
-    tenantRelationship: string,
+    relationship: string,
 ): QueryStatement =>
 {
     query.include = [
         ...(query.include ? query.include : []),
         {
-            association: tenantRelationship,
+            association: relationship,
             required   : true,
         },
     ];
