@@ -73,5 +73,29 @@ describe('Utils', () =>
 
             expect(Utils.diff(newObj, origObj)).toStrictEqual([3]);
         });
+
+        test('Utils array intersects has alls elements', () =>
+        {
+            const arrA = [1, 2, 3];
+            const arrB = [1, 2, 4];
+
+            expect(Utils.arraysIntersects(arrA, arrB)).toBe(true);
+        });
+
+        test('Utils array intersects has one element', () =>
+        {
+            const arrA = [1, 2, 3];
+            const arrB = [1, 8, 18];
+
+            expect(Utils.arraysIntersects(arrA, arrB)).toBe(true);
+        });
+
+        test('Utils array intersects hasn\'t any element', () =>
+        {
+            const arrA = [1, 2, 3];
+            const arrB = [9, 8, 8, 18];
+
+            expect(Utils.arraysIntersects(arrA, arrB)).toBe(false);
+        });
     });
 });
