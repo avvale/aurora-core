@@ -10,7 +10,7 @@ export class ImageManager
 
         return {
             width : metadata.width,
-            height: metadata.height
+            height: metadata.height,
         };
     }
 

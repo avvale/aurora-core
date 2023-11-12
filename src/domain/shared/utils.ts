@@ -117,6 +117,13 @@ export class Utils
         return arr.filter(ele => !arrValues.includes(ele));
     }
 
+    // determines if two arrays have a common item
+    public static arraysIntersects<T = any>(arr1: T[], arr2: T[]): boolean
+    {
+        const arrayUniqueValues = new Set(arr2);
+        return [...new Set(arr1)].some(x => arrayUniqueValues.has(x));
+    }
+
     public static arraysHasSameValues<T = any>(arr1: T[], arr2: T[]): boolean
     {
         if (arr1.length === arr2.length)
