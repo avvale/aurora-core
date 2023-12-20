@@ -59,7 +59,7 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
 
     // eslint-disable-next-line no-await-in-loop
     const { createReadStream, filename: originFilename, mimetype, encoding } = await file.file;
-    const extensionFile = extname(originFilename);
+    const extensionFile = extname(originFilename).toLowerCase();
     const filename = `${file.id}${extensionFile}`;
     const absolutePath = storagePublicAbsolutePath(relativePathSegments, filename);
 
