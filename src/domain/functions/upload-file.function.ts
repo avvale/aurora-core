@@ -95,7 +95,7 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
         isCropable,
         isUploaded: true,
         meta      : {
-            imageMetadata: metadata,
+            imageMeta: metadata,
         },
     };
 
@@ -115,8 +115,8 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
         );
 
         // set coreFile properties from cropable file
-        coreFile.width = coreFile.meta.imageMetadata.width;
-        coreFile.height = coreFile.meta.imageMetadata.height;
+        coreFile.width = coreFile.meta.imageMeta.width;
+        coreFile.height = coreFile.meta.imageMeta.height;
         coreFile.library = {
             id                  : libraryId,
             originFilename,
@@ -124,12 +124,12 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
             mimetype,
             extension           : extensionFile,
             relativePathSegments: coreFile.relativePathSegments,
-            width               : coreFile.meta.imageMetadata.width,
-            height              : coreFile.meta.imageMetadata.height,
+            width               : coreFile.meta.imageMeta.width,
+            height              : coreFile.meta.imageMeta.height,
             size                : coreFile.size,
             url                 : storagePublicAbsoluteURL(relativePathSegments, filename),
             meta                : {
-                imageMetadata: coreFile.meta.imageMetadata,
+                imageMeta: coreFile.meta.imageMeta,
             },
         };
     }
