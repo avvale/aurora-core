@@ -260,6 +260,7 @@ export class Utils
             case 'image/jpeg':
             case 'image/pjpeg':
             case 'image/png':
+            case 'image/webp':
             case 'image/svg+xml':
                 return true;
                 break;

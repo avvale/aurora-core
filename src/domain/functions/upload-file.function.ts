@@ -80,9 +80,6 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
     // check if file can do a crop action
     const isCropable = mimetype === 'image/jpeg' || mimetype === 'image/png' || mimetype === 'image/gif' || mimetype === 'image/webp';
 
-    // set metadata for image
-    const metadata = await sharp(absolutePath).metadata();
-
     const coreFile: CoreFile = {
         id        : file.id,
         originFilename,
@@ -95,7 +92,7 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
         isCropable,
         isUploaded: true,
         meta      : {
-            imageMeta: metadata,
+            fileMeta: isCropable ? await sharp(absolutePath).metadata() : stats,
         },
     };
 
@@ -115,8 +112,8 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
         );
 
         // set coreFile properties from cropable file
-        coreFile.width = coreFile.meta.imageMeta.width;
-        coreFile.height = coreFile.meta.imageMeta.height;
+        coreFile.width = coreFile.meta.fileMeta.width;
+        coreFile.height = coreFile.meta.fileMeta.height;
         coreFile.library = {
             id                  : libraryId,
             originFilename,
@@ -124,12 +121,12 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
             mimetype,
             extension           : extensionFile,
             relativePathSegments: coreFile.relativePathSegments,
-            width               : coreFile.meta.imageMeta.width,
-            height              : coreFile.meta.imageMeta.height,
+            width               : coreFile.meta.fileMeta.width,
+            height              : coreFile.meta.fileMeta.height,
             size                : coreFile.size,
             url                 : storagePublicAbsoluteURL(relativePathSegments, filename),
             meta                : {
-                imageMeta: coreFile.meta.imageMeta,
+                fileMeta: coreFile.meta.fileMeta,
             },
         };
     }
