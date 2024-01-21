@@ -95,21 +95,6 @@ export class Utils
         return changes(newObj, origObj);
     }
 
-    // gets all child elements in an array of objects, related by parentId
-    public static getChildren<T extends { id: string; parentId: string; } = any>(data: T[], parentId: string): T[]
-    {
-        let children = [];
-        for (let i = 0; i < data.length; i++)
-        {
-            if (data[i].parentId === parentId)
-            {
-                children.push(data[i]);
-                children = children.concat(Utils.getChildren(data, data[i].id));
-            }
-        }
-        return children;
-    }
-
     public static arrayRemoveItem<T = any>(arr: T[], value: T | T[]): T[]
     {
         let arrValues: T[];
