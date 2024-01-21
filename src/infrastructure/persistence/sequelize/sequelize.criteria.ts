@@ -11,6 +11,7 @@ import { CQMetadata } from '../../../domain/aurora.types';
 import { Utils } from '../../../domain/shared/utils';
 import { Operator } from '../../../domain/persistence/sql-statement/operator';
 import { merge, isEmpty } from 'lodash';
+import { setSequelizeFunctions } from './functions/set-sequelize-functions.function';
 
 export class SequelizeCriteria implements ICriteria
 {
@@ -42,7 +43,7 @@ export class SequelizeCriteria implements ICriteria
         }
 
         // replace key string by sequelize symbols
-        return Utils.deepMapKeysOperators(
+        queryStatement = Utils.deepMapKeysOperators(
             queryStatement,
             key => key.startsWith('[') &&
             key.endsWith(']') &&
@@ -50,6 +51,11 @@ export class SequelizeCriteria implements ICriteria
                 ? Op[key.slice(1,-1)]
                 : key,
         );
+
+        // set sequelize functions to query statement
+        queryStatement = setSequelizeFunctions(queryStatement);
+
+        return queryStatement;
     }
 
     mergeQueryConstraintStatement(
