@@ -58,6 +58,9 @@ export class Utils
         return uuidv4();
     }
 
+    /**
+     * @deprecated Use nanoid() from import { nanoid } from 'nanoid';
+     */
     public static nanoid(): string
     {
         return nanoid();
@@ -78,6 +81,9 @@ export class Utils
         return Buffer.from(data, 'base64').toString('utf-8');
     }
 
+    /**
+     * @deprecated The method should not be used
+     */
     public static diff(newObj, origObj): any
     {
         const changes = (newObj, origObj): any =>
