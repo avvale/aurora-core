@@ -1,4 +1,5 @@
 export * from './add-relationship-include.function';
+export * from './diff.function';
 export * from './get-nested-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
 export * from './get-request-from-execution-context.function';
