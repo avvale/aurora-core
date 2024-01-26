@@ -1,3 +1,5 @@
+import * as _ from 'lodash';
+
 export const diff = <T = any>(newObj: T, origObj: T): T =>
 {
     const changes = (newObj, origObj): any =>
