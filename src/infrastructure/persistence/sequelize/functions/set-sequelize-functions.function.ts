@@ -32,7 +32,7 @@ export const setSequelizeFunctions = (
                         {
                             /********************************************************************************
                             *   return function instance of object, should be a array position, example:
-                            *   [ Op.or]: [
+                            *   [Op.or]: [
                             *       {
                             *           'name::unaccent': {
                             *               [iLike]: 'Hello'
