@@ -137,4 +137,16 @@ export interface IRepository<Aggregate>
             cQMetadata?: CQMetadata;
         }
     ): Promise<void>;
+
+    // increment record
+    increment(
+        item: Aggregate,
+        options?: {
+            incrementOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        }
+    ): Promise<void>;
 }
