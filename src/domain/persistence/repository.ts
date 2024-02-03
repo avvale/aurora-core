@@ -108,6 +108,18 @@ export interface IRepository<Aggregate>
         }
     ): Promise<void>;
 
+    // update and increment record
+    updateAndIncrement(
+        item: Aggregate,
+        options?: {
+            updateAndIncrementOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        }
+    ): Promise<void>;
+
     // insert or update key identification elements already existing in the table
     upsert(
         item: Aggregate,
@@ -135,18 +147,6 @@ export interface IRepository<Aggregate>
             queryStatement?: QueryStatement;
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
-        }
-    ): Promise<void>;
-
-    // increment record
-    increment(
-        item: Aggregate,
-        options?: {
-            incrementOptions?: LiteralObject;
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => LiteralObject;
         }
     ): Promise<void>;
 }

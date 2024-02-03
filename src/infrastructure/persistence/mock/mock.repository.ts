@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { Pagination } from '../../../domain/shared/pagination';
@@ -223,6 +224,28 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
     }
 
+    async updateAndIncrement(
+        aggregate: Aggregate,
+        {
+            updateAndIncrementOptions = undefined,
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
+        }: {
+            updateAndIncrementOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+            findArguments?: LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        // check allRows variable to allow increment all rows
+        if (!queryStatement || !queryStatement.where || updateAndIncrementOptions?.allRows) throw new BadRequestException('To update and increment multiple records, you must define a where statement');
+    }
+
     async upsert(
         aggregate: Aggregate,
         {
@@ -272,27 +295,5 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
     {
         // eslint-disable-next-line max-len
         if (!Array.isArray(queryStatement) || queryStatement.length === 0 || deleteOptions?.allRows) throw new BadRequestException('To delete multiple records, you must define a query statement');
-    }
-
-    async increment(
-        aggregate: Aggregate,
-        {
-            incrementOptions = undefined,
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
-        }: {
-            incrementOptions?: LiteralObject;
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => LiteralObject;
-            findArguments?: LiteralObject;
-        } = {},
-    ): Promise<void>
-    {
-        // check allRows variable to allow increment all rows
-        if (!queryStatement || !queryStatement.where || incrementOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
     }
 }

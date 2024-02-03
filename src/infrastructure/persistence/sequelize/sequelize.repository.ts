@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
@@ -8,6 +9,7 @@ import { IMapper } from '../../../domain/shared/mapper';
 import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { Pagination } from '../../../domain/shared/pagination';
+import { setSequelizeIncrementFunction } from './functions/set-sequelize-increment.function';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
@@ -389,7 +391,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (!modelInDB) throw new NotFoundException(`${this.aggregateName} not found`);
 
         // clean undefined fields, to avoid update undefined fields
-        const LiteralObject = cleanDeep(dataFactory(aggregate), {
+        const payload = cleanDeep(dataFactory(aggregate), {
             nullValues  : false,
             emptyStrings: false,
             emptyObjects: false,
@@ -399,7 +401,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // set auditingRunner to implement DI in model
         if (updateByIdOptions?.auditing) updateByIdOptions.auditing.auditingRunner = this.auditingRunner;
 
-        const model = await modelInDB.update(LiteralObject, updateByIdOptions);
+        const model = await modelInDB.update(payload, updateByIdOptions);
 
         this.updatedByIdAggregateHook(aggregate, model, updateByIdOptions);
     }
@@ -436,7 +438,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         ) throw new BadRequestException('To increment multiple records, you must define a where statement else use allRows: true, property in updateOptions');
 
         // clean undefined fields, to avoid update undefined fields
-        const LiteralObject = cleanDeep(dataFactory(aggregate), {
+        const payload = cleanDeep(dataFactory(aggregate), {
             nullValues  : false,
             emptyStrings: false,
             emptyObjects: false,
@@ -448,7 +450,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         // execute update statement
         const model = await this.repository.update(
-            LiteralObject,
+            payload,
             // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             {
                 ...this.criteria.implements(
@@ -470,6 +472,67 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         model: Model<ModelClass>,
         updateOptions: LiteralObject,
+    ): Promise<void> { /**/ }
+
+    async updateAndIncrement(
+        aggregate: Aggregate,
+        {
+            updateAndIncrementOptions = undefined,
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
+        }: {
+            updateAndIncrementOptions?: LiteralObject;
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+            dataFactory?: (aggregate: Aggregate) => LiteralObject;
+        } = {},
+    ): Promise<void>
+    {
+        // check allRows variable to allow update all rows
+        if (
+            !queryStatement ||
+            !queryStatement.where ||
+            updateAndIncrementOptions?.allRows
+        ) throw new BadRequestException('To update and increment multiple records, you must define a where statement else use allRows: true, property in updateAndIncrementOptions');
+
+        // clean undefined fields, to avoid update undefined fields
+        const payload = cleanDeep(dataFactory(aggregate), {
+            nullValues  : false,
+            emptyStrings: false,
+            emptyObjects: false,
+            emptyArrays : false,
+        });
+
+        // set auditingRunner to implement DI in model
+        if (updateAndIncrementOptions?.auditing) updateAndIncrementOptions.auditing.auditingRunner = this.auditingRunner;
+
+        // execute update statement
+        const model = await this.repository.update(
+            setSequelizeIncrementFunction(payload),
+            // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            {
+                ...this.criteria.implements(
+                    this.criteria.mergeQueryConstraintStatement(
+                        queryStatement,
+                        constraint,
+                    ),
+                    cQMetadata,
+                ),
+                ...updateAndIncrementOptions,
+            },
+        );
+
+        this.updateAndIncrementAggregateHook(aggregate, model, updateAndIncrementOptions);
+    }
+
+    // hook called after increment aggregate
+    async updateAndIncrementAggregateHook(
+        aggregate: Aggregate,
+        model: Model<ModelClass>,
+        updateAndIncrementOptions: LiteralObject,
     ): Promise<void> { /**/ }
 
     async upsert(
@@ -580,65 +643,4 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             },
         );
     }
-
-    async increment(
-        aggregate: Aggregate,
-        {
-            incrementOptions = undefined,
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-            dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
-        }: {
-            incrementOptions?: LiteralObject;
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-            dataFactory?: (aggregate: Aggregate) => LiteralObject;
-        } = {},
-    ): Promise<void>
-    {
-        // check allRows variable to allow update all rows
-        if (
-            !queryStatement ||
-            !queryStatement.where ||
-            incrementOptions?.allRows
-        ) throw new BadRequestException('To increment multiple records, you must define a where statement else use allRows: true, property in incrementOptions');
-
-        // clean undefined fields, to avoid update undefined fields
-        const LiteralObject = cleanDeep(dataFactory(aggregate), {
-            nullValues  : false,
-            emptyStrings: false,
-            emptyObjects: false,
-            emptyArrays : false,
-        });
-
-        // set auditingRunner to implement DI in model
-        if (incrementOptions?.auditing) incrementOptions.auditing.auditingRunner = this.auditingRunner;
-
-        // execute update statement
-        const model = await this.repository.increment(
-            LiteralObject,
-            // pass query, constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            {
-                ...this.criteria.implements(
-                    this.criteria.mergeQueryConstraintStatement(
-                        queryStatement,
-                        constraint,
-                    ),
-                    cQMetadata,
-                ),
-                ...incrementOptions,
-            },
-        );
-
-        this.incrementAggregateHook(aggregate, model, incrementOptions);
-    }
-
-    // hook called after increment aggregate
-    async incrementAggregateHook(
-        aggregate: Aggregate,
-        model: Model<ModelClass>,
-        updateOptions: LiteralObject,
-    ): Promise<void> { /**/ }
 }
