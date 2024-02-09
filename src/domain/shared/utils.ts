@@ -47,6 +47,8 @@ export class Utils
         return generator.digest('hex');
     }
 
+    // @deprecated
+    // Use uuid function instead
     public static uuid(seed?: string): string
     {
         if (seed)
