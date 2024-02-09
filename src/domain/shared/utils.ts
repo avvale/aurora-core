@@ -24,6 +24,8 @@ export class Utils
         return dayjs();
     }
 
+    // @deprecated
+    // Use nowTimestamp function instead
     public static nowTimestamp(): string
     {
         return dayjs().format('YYYY-MM-DD H:mm:ss');

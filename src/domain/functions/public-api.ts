@@ -3,6 +3,7 @@ export * from './diff.function';
 export * from './get-nested-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
 export * from './get-request-from-execution-context.function';
+export * from './now-timestamp.function';
 export * from './object-to-query-params.function';
 export * from './storage-public-absolute-directory-path.function';
 export * from './storage-public-absolute-directory-url.function';
