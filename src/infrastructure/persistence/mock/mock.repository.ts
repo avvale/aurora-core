@@ -133,6 +133,54 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
         return this.collectionSource.length;
     }
 
+    async max(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        return this.collectionSource.reduce((max, item) => (item[column] > max ? item[column] : max), 0);
+    }
+
+    async min(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        return this.collectionSource.reduce((min, item) => (item[column] < min ? item[column] : min), 0);
+    }
+
+    async sum(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        return this.collectionSource.reduce((sum, item) => sum + item[column], 0);
+    }
+
     // ******************
     // ** side effects **
     // ******************

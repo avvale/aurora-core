@@ -266,6 +266,123 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         cQMetadata?: CQMetadata,
     ): HookResponse { return { queryStatement, cQMetadata }; }
 
+    // max records
+    async max(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
+        const hookResponse = this.composeStatementMaxHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
+
+        const nMaxRecord = await this.repository.max(
+            column,
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
+
+        return nMaxRecord;
+    }
+
+    // hook to add max
+    composeStatementMaxHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
+
+    // min records
+    async min(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
+        const hookResponse = this.composeStatementMinHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
+
+        const nMinRecord = await this.repository.min(
+            column,
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
+
+        return nMinRecord;
+    }
+
+    // hook to add max
+    composeStatementMinHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
+
+    // sum records
+    async sum(
+        column,
+        {
+            queryStatement = {},
+            constraint = {},
+            cQMetadata = undefined,
+        }: {
+            queryStatement?: QueryStatement;
+            constraint?: QueryStatement;
+            cQMetadata?: CQMetadata;
+        } = {},
+    ): Promise<number>
+    {
+        // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
+        const hookResponse = this.composeStatementSumHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
+
+        const nMinRecord = await this.repository.sum(
+            column,
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            cQMetadata?.repositoryOptions,
+        );
+
+        return nMinRecord;
+    }
+
+    // hook to add sum
+    composeStatementSumHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse { return { queryStatement, cQMetadata }; }
+
     // ******************
     // ** side effects **
     // ******************
