@@ -1,4 +1,5 @@
 export * from './add-relationship-include.function';
+export * from './date-from-format.function';
 export * from './diff.function';
 export * from './extension-from-mimetype.function';
 export * from './get-nested-objects-from-parent-id.function';
