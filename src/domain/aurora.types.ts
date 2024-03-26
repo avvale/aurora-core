@@ -9,14 +9,14 @@ export interface AuditingAccount
 
 export interface AuditingMeta<T extends AuditingAccount = AuditingAccount>
 {
-    ip: string;
+    ip?: string;
     auditingRunner?: AuditingRunner;
-    userAgent: string;
-    method: string;
-    baseUrl: string;
-    params: { [key: string]: any; };
-    query: { [key: string]: any; };
-    body: { [key: string]: any; };
+    userAgent?: string;
+    method?: string;
+    baseUrl?: string;
+    params?: { [key: string]: any; };
+    query?: { [key: string]: any; };
+    body?: { [key: string]: any; };
     account: T;
     operationId?: string;
     operationSort?: number;
