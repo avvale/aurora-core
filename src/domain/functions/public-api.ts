@@ -2,6 +2,8 @@ export * from './add-relationship-include.function';
 export * from './date-from-format.function';
 export * from './diff.function';
 export * from './extension-from-mimetype.function';
+export * from './get-anonymous-system-account.function';
+export * from './get-basic-auditing-meta.function';
 export * from './get-nested-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
 export * from './get-request-from-execution-context.function';
