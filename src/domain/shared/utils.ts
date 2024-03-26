@@ -105,6 +105,9 @@ export class Utils
         return changes(newObj, origObj);
     }
 
+    /**
+     * @deprecated Use Array.removeItem instead
+     */
     public static arrayRemoveItem<T = any>(arr: T[], value: T | T[]): T[]
     {
         let arrValues: T[];

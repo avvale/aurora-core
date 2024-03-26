@@ -1,7 +1,8 @@
-Array.prototype.removeItem = function <T>(value: T): Array<T>
+Array.prototype.removeItem = function <T>(values: T | T[]): Array<T>
 {
-    const index = this.indexOf(value);
-    if (index > -1) this.splice(index, 1);
+    if (!values) return [];
 
-    return this;
+    const finalValues = Array.isArray(values) ? values : [values];
+
+    return this.filter(item => !finalValues.includes(item));
 };
