@@ -10,12 +10,12 @@ export class CoreGetBase64FromFileResolver
     ) {}
 
     @Query('coreGetBase64FromFile')
-    async main(
+    main(
         @Args('relativePathSegments') relativePathSegments: string[],
         @Args('filename') filename: string,
     )
     {
-        return await this.handler.main(
+        return this.handler.main(
             relativePathSegments,
             filename,
         );

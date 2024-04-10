@@ -15,12 +15,12 @@ export class CoreGetBase64FromFileController
     @HttpCode(200)
     @ApiOperation({ summary: 'Get base64 from file' })
     @ApiCreatedResponse({ description: 'The record has been successfully returned.' })
-    async main(
+    main(
         @Body('relativePathSegments') relativePathSegments?: string[],
         @Body('filename') filename?: string,
     )
     {
-        return await this.handler.main(
+        return this.handler.main(
             relativePathSegments,
             filename,
         );

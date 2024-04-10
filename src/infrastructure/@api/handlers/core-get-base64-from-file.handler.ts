@@ -9,12 +9,12 @@ export class CoreGetBase64FromFileHandler
         private readonly coreGetBase64FromFileService: CoreGetBase64FromFileService,
     ) {}
 
-    async main(
+    main(
         relativePathSegments: string[],
         filename: string,
     )
     {
-        return await this.coreGetBase64FromFileService.main(
+        return this.coreGetBase64FromFileService.main(
             relativePathSegments,
             filename,
         );
