@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Controller, Get } from '@nestjs/common';
-import { ApiTags, ApiCreatedResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiCreatedResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import * as fs from 'node:fs';
+import { env } from 'node:process';
 
 @ApiTags('[core] environment information')
 @Controller('core/environment-information')
@@ -15,8 +16,9 @@ export class CoreEnvironmentInformationController
         const packageFile = JSON.parse(fs.readFileSync(process.cwd() + '/package.json', 'utf8'));
 
         return {
-            name   : packageFile.name,
-            version: packageFile.version,
+            name       : packageFile.name,
+            version    : packageFile.version,
+            environment: env.NODE_ENV,
         };
     }
 }
