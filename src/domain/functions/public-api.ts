@@ -7,6 +7,7 @@ export * from './get-basic-auditing-meta.function';
 export * from './get-nested-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
 export * from './get-request-from-execution-context.function';
+export * from './memory-watcher.function';
 export * from './mimetype-from-extension.function';
 export * from './now-timestamp.function';
 export * from './now.function';
