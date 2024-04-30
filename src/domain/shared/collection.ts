@@ -14,9 +14,8 @@ class Collection<T>
         return this._items;
     }
 
-    deleteItems(items: T[] | T): this
+    deleteItems(items: T[]): this
     {
-        if (!Array.isArray(items)) items = [items];
         items.forEach(value => this._items.delete(value));
         return this;
     }
@@ -35,6 +34,12 @@ class Collection<T>
     has(item: T): boolean
     {
         return this._items.has(item);
+    }
+
+    addItems(items: T[]): this
+    {
+        items.forEach(value => this._items.add(value));
+        return this;
     }
 
     add(item: T): this
