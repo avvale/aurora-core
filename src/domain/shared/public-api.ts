@@ -1,3 +1,4 @@
+export * from './collection';
 export * from './dayjs-config';
 export * from './mapper';
 export * from './pagination';
