@@ -14,14 +14,18 @@ class Collection<T>
         return this._items;
     }
 
-    deleteItems(items: T[]): this
+    deleteItems(items: T[], confirm: () => boolean = () => true): this
     {
+        if (!confirm()) return this;
+
         items.forEach(value => this._items.delete(value));
         return this;
     }
 
-    delete(item: T): this
+    delete(item: T, confirm: () => boolean = () => true): this
     {
+        if (!confirm()) return this;
+
         this._items.delete(item);
         return this;
     }
@@ -36,20 +40,26 @@ class Collection<T>
         return this._items.has(item);
     }
 
-    addItems(items: T[]): this
+    addItems(items: T[], confirm: () => boolean = () => true): this
     {
+        if (!confirm()) return this;
+
         items.forEach(value => this._items.add(value));
         return this;
     }
 
-    add(item: T): this
+    add(item: T, confirm: () => boolean = () => true): this
     {
+        if (!confirm()) return this;
+
         this._items.add(item);
         return this;
     }
 
-    clear(): this
+    clear(confirm: () => boolean = () => true): this
     {
+        if (!confirm()) return this;
+
         this._items.clear();
         return this;
     }
