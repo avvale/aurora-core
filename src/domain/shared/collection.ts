@@ -1,4 +1,4 @@
-export const collection = <T = any>(items: T[]):Collection<T> => new Collection<T>(items);
+export const collection = <T = any>(items: T[]): Collection<T> => new Collection<T>(items);
 
 class Collection<T>
 {
