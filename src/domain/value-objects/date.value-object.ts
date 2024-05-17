@@ -21,7 +21,10 @@ export abstract class DateValueObject extends StringValueObject
         // avoid manage null and undefined values, return a invalid date string
         if (value === null || value === undefined) return;
 
-        if (value !== null && value !== undefined && !((new Date(value)).getTime() > 0)) throw new BadRequestException(`Value for ${this.validationRules.name} has to be a date value, value ${value} is a not valid date, format YYYY-MM-DD expected`);
+        if (value !== null && value !== undefined && isNaN((new Date(value)).getTime()))
+        {
+            throw new BadRequestException(`Value for ${this.validationRules.name} has to be a date value, value ${value} is a not valid date, format YYYY-MM-DD expected`);
+        }
 
         if (this.data.addTimezone)
         {
