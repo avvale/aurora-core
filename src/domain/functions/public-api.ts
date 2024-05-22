@@ -5,6 +5,7 @@ export * from './extension-from-mimetype.function';
 export * from './get-anonymous-system-account.function';
 export * from './get-basic-auditing-meta.function';
 export * from './get-nested-objects-from-parent-id.function';
+export * from './get-parent-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
 export * from './get-request-from-execution-context.function';
 export * from './is-valid-json.function';
