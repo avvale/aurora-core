@@ -35,7 +35,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     ): Promise<Pagination<Aggregate>>
     {
         // manage hook count paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
-        const hookCountResponse = this.countStatementPaginateHook(constraint, cQMetadata);
+        // we clone constraint to break the reference and to be able to delete attributes later on
+        const hookCountResponse = this.countStatementPaginateHook({ ...constraint }, cQMetadata);
+
+        // remove attributes to count all records, otherwise we will get a SQL error
+        delete hookCountResponse.queryStatement.attributes;
 
         // get count total records from sql service library
         const total = await this.repository.count(
