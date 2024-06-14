@@ -91,6 +91,12 @@ export interface MapperOptions
     eagerLoading: boolean;
 }
 
+export enum PromiseSettledResultStatus
+{
+    FULFILLED = 'fulfilled',
+    REJECTED = 'rejected',
+}
+
 export interface SeederBoundedContext
 {
     id: string;
