@@ -51,7 +51,7 @@ export const setSequelizeFunctions = (
                                 // return function instance of object
                                 case 'unaccent':
                                     // if column start with '$' and end with '$' then remove it when use unaccent, because use the Sequelize.col function.
-                                    const parsedColumn = column.startWith('$') && column.endsWith('$') ? column.slice(1, -1) : column;
+                                    const parsedColumn = column.startsWith('$') && column.endsWith('$') ? column.slice(1, -1) : column;
                                     return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(parsedColumn)), setSequelizeFunctions(value, { setUnaccentValues: true }));
 
                                 case 'cast':
