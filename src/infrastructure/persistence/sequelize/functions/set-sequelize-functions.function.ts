@@ -30,6 +30,9 @@ export const setSequelizeFunctions = (
                         const [column, ...functions] = key.split('::');
                         for (const [index, fn] of functions.entries())
                         {
+                            // if column start with '$' and end with '$' then remove it when use unaccent or cast, because use the Sequelize.col function.
+                            const parsedColumn = column.startsWith('$') && column.endsWith('$') ? column.slice(1, -1) : column;
+
                             /********************************************************************************
                             *   return function instance of object, should be a array position, example:
                             *   [Op.or]: [
@@ -50,12 +53,10 @@ export const setSequelizeFunctions = (
                             {
                                 // return function instance of object
                                 case 'unaccent':
-                                    // if column start with '$' and end with '$' then remove it when use unaccent, because use the Sequelize.col function.
-                                    const parsedColumn = column.startsWith('$') && column.endsWith('$') ? column.slice(1, -1) : column;
                                     return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(parsedColumn)), setSequelizeFunctions(value, { setUnaccentValues: true }));
 
                                 case 'cast':
-                                    return Sequelize.where(Sequelize.cast(Sequelize.col(column), functions[index + 1]), setSequelizeFunctions(value));
+                                    return Sequelize.where(Sequelize.cast(Sequelize.col(parsedColumn), functions[index + 1]), setSequelizeFunctions(value));
                             }
                         }
                     }

@@ -50,7 +50,7 @@ interface CoreLibraryFile {
 // CoreFileUploaded has relativePathSegments, that is an array
 // of strings that represents the path to the file will be stored.
 // by default, the file will be stored in the tmp directory.
-export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
+export const uploadFile = async (file: CoreFileUploaded, hasFileMeta = true): Promise<CoreFile> =>
 {
     // by default all files are saved in the tmp folder, so that after manipulation they are saved in the corresponding folder
     // if it is not necessary to manipulate the file, it can be saved directly in the corresponding folder.
@@ -92,7 +92,7 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
         isCropable,
         isUploaded: true,
         meta      : {
-            fileMeta: isCropable ? await sharp(absolutePath).metadata() : stats,
+            fileMeta: hasFileMeta ? isCropable ? await sharp(absolutePath).metadata() : stats : undefined,
         },
     };
 
@@ -134,9 +134,13 @@ export const uploadFile = async (file: CoreFileUploaded): Promise<CoreFile> =>
     return coreFile;
 };
 
-export const uploadFiles = async (files: CoreFileUploaded[]): Promise<CoreFile[]> =>
+export const uploadFiles = async (files: CoreFileUploaded[], hasFileMeta = true): Promise<CoreFile[]> =>
 {
     const responses = [];
-    for (const file of files) responses.push(uploadFile(file));
+    for (const file of files)
+    {
+        const savedFile = await uploadFile(file, hasFileMeta);
+        responses.push(savedFile);
+    }
     return responses;
 };
