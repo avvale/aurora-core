@@ -307,9 +307,9 @@ export class Utils
      * @param stream stream to save
      * @returns Promise
      */
-    public static storageStream(path: string | URL, stream: any): Promise<unknown>
+    public static storageStream(path: string | URL, stream: any): Promise<void>
     {
-        return new Promise((resolve, reject) =>
+        return new Promise((resolve: () => void, reject) =>
         {
             // Create a stream to which the upload will be written.
             const writeStream = createWriteStream(path);

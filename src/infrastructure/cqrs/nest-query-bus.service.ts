@@ -9,7 +9,7 @@ export class NestQueryBus implements IQueryBus
         private readonly queryBus: NestQueryBusImplementation
     ) {}
 
-    async ask<T extends ICommand>(query: T): Promise<any>
+    async ask<T extends ICommand, R = any>(query: T): Promise<R>
     {
         return await this.queryBus.execute(query);
     }

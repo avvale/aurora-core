@@ -39,7 +39,7 @@ export abstract class ValueObject<T> implements IValueObject<T>
         return this._value;
     }
 
-    constructor(dataValue: T | DataValueObject, validationRules: ValidationRules = {}, data: DataValueObject | T = {})
+    constructor(dataValue: T | DataValueObject | undefined, validationRules: ValidationRules = {}, data: DataValueObject | T = {})
     {
         // set default value
         let value = undefined;
