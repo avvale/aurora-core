@@ -4,6 +4,7 @@ export * from './diff.function';
 export * from './extension-from-mimetype.function';
 export * from './get-anonymous-system-account.function';
 export * from './get-basic-auditing-meta.function';
+export * from './get-basic-auth.function';
 export * from './get-nested-objects-from-parent-id.function';
 export * from './get-parent-objects-from-parent-id.function';
 export * from './get-relative-path-segments.function';
