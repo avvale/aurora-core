@@ -47,6 +47,11 @@ export interface CoreFileUploaded
     relativePathSegments?: string[];
     containerName?: string
     hasCreateLibrary?: boolean;
+    meta?: any;
+}
+
+export interface CoreBase64File {
+    base64: string;
 }
 
 export interface CoreFile {

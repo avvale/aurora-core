@@ -1,65 +1,25 @@
-import { getRelativePathSegments, storagePublicAbsoluteDirectoryPath, storagePublicAbsolutePath, storagePublicAbsoluteURL, storageStream, uuid } from '../functions';
 import { copyFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
 import { extname } from 'node:path';
 import * as sharp from 'sharp';
-
-interface CoreFileUploaded {
-    id: string;
-    file: any;
-    relativePathSegments?: string[];
-    hasCreateLibrary?: boolean;
-}
-
-interface CoreFile {
-    id: string;
-    originFilename: string;
-    filename: string;
-    mimetype: string;
-    extension: string;
-    relativePathSegments: string[];
-    width?: number;
-    height?: number;
-    size: number;
-    url: string;
-    isCropable: boolean;
-    isUploaded: boolean;
-    libraryId?: string;
-    libraryFilename?: string;
-    library?: CoreLibraryFile;
-    meta?: any;
-}
-
-interface CoreLibraryFile {
-    id: string;
-    originFilename: string;
-    filename: string;
-    mimetype: string;
-    extension: string;
-    relativePathSegments: string[];
-    width: number;
-    height: number;
-    size: number;
-    url: string;
-    meta?: any;
-}
+import { getRelativePathSegments, storagePublicAbsoluteDirectoryPath, storagePublicAbsolutePath, storagePublicAbsoluteURL, storageStream, uuid } from '../functions';
+import { CoreFile, CoreFileUploaded } from '../types';
 
 // CoreFileUploaded has relativePathSegments, that is an array
 // of strings that represents the path to the file will be stored.
 // by default, the file will be stored in the tmp directory.
 export const uploadFile = async (
-    file: CoreFileUploaded,
-    hasFileMeta = true
+    filePayload: CoreFileUploaded,
 ): Promise<CoreFile> =>
 {
     // by default all files are saved in the tmp folder, so that after manipulation they are saved in the corresponding folder
     // if it is not necessary to manipulate the file, it can be saved directly in the corresponding folder.
-    const relativePathSegments = getRelativePathSegments(file.relativePathSegments);
+    const relativePathSegments = getRelativePathSegments(filePayload.relativePathSegments);
     const absoluteDirectoryPath = storagePublicAbsoluteDirectoryPath(relativePathSegments);
 
     // eslint-disable-next-line no-await-in-loop
-    const { createReadStream, filename: originFilename, mimetype, encoding } = await file.file;
+    const { createReadStream, filename: originFilename, mimetype, encoding } = await filePayload.file;
     const extensionFile = extname(originFilename).toLowerCase() === '.jpeg' ? '.jpg' : extname(originFilename).toLowerCase();
-    const filename = `${file.id}${extensionFile}`;
+    const filename = `${filePayload.id}${extensionFile}`;
     const absolutePath = storagePublicAbsolutePath(relativePathSegments, filename);
 
     // create directory if not exists
@@ -80,7 +40,7 @@ export const uploadFile = async (
     const isCropable = mimetype === 'image/jpeg' || mimetype === 'image/png' || mimetype === 'image/gif' || mimetype === 'image/webp';
 
     const coreFile: CoreFile = {
-        id        : file.id,
+        id        : filePayload.id,
         originFilename,
         filename,
         mimetype,
@@ -96,7 +56,7 @@ export const uploadFile = async (
     };
 
     // add cropable properties
-    if (isCropable && file.hasCreateLibrary)
+    if (isCropable && filePayload.hasCreateLibrary)
     {
         const libraryId = uuid();
         const filename = `${libraryId}${coreFile.extension}`;
@@ -133,13 +93,15 @@ export const uploadFile = async (
     return coreFile;
 };
 
-export const uploadFiles = async (files: CoreFileUploaded[]): Promise<CoreFile[]> =>
+export const uploadFiles = async (
+    filePayloads: CoreFileUploaded[],
+): Promise<CoreFile[]> =>
 {
     const responses = [];
-    for (const file of files)
+    for (const filePayload of filePayloads)
     {
-        const savedFile = await uploadFile(file);
+        const savedFile = uploadFile(filePayload);
         responses.push(savedFile);
     }
-    return responses;
+    return Promise.all(responses);
 };

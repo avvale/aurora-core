@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { CoreFile, CoreFileUploaded } from '../types';
 import { getRelativePathSegments, storagePublicAbsoluteDirectoryPath, storagePublicAbsolutePath, storagePublicAbsoluteURL, storageStream, uuid } from '../functions';
 import { extname } from 'node:path';
@@ -11,23 +10,21 @@ import * as sharp from 'sharp';
 export class CoreUploadFileManagerService
 {
     constructor(
-        private readonly configService: ConfigService,
     ) {}
 
     async uploadFile(
-        file: CoreFileUploaded,
-        hasFileMeta = true,
+        filePayload: CoreFileUploaded,
     ): Promise<CoreFile>
     {
         // by default all files are saved in the tmp folder, so that after manipulation they are saved in the corresponding folder
         // if it is not necessary to manipulate the file, it can be saved directly in the corresponding folder.
-        const relativePathSegments = getRelativePathSegments(file.relativePathSegments);
+        const relativePathSegments = getRelativePathSegments(filePayload.relativePathSegments);
         const absoluteDirectoryPath = storagePublicAbsoluteDirectoryPath(relativePathSegments);
 
         // eslint-disable-next-line no-await-in-loop
-        const { createReadStream, filename: originFilename, mimetype, encoding } = await file.file;
+        const { createReadStream, filename: originFilename, mimetype, encoding } = await filePayload.file;
         const extensionFile = extname(originFilename).toLowerCase() === '.jpeg' ? '.jpg' : extname(originFilename).toLowerCase();
-        const filename = `${file.id}${extensionFile}`;
+        const filename = `${filePayload.id}${extensionFile}`;
         const absolutePath = storagePublicAbsolutePath(relativePathSegments, filename);
 
         // create directory if not exists
@@ -48,7 +45,7 @@ export class CoreUploadFileManagerService
         const isCropable = mimetype === 'image/jpeg' || mimetype === 'image/png' || mimetype === 'image/gif' || mimetype === 'image/webp';
 
         const coreFile: CoreFile = {
-            id        : file.id,
+            id        : filePayload.id,
             originFilename,
             filename,
             mimetype,
@@ -59,12 +56,12 @@ export class CoreUploadFileManagerService
             isCropable,
             isUploaded: true,
             meta      : {
-                fileMeta: hasFileMeta ? isCropable ? await sharp(absolutePath).metadata() : stats : undefined,
+                fileMeta: isCropable ? await sharp(absolutePath).metadata() : stats,
             },
         };
 
         // add cropable properties
-        if (isCropable && file.hasCreateLibrary)
+        if (isCropable && filePayload.hasCreateLibrary)
         {
             const libraryId = uuid();
             const filename = `${libraryId}${coreFile.extension}`;
@@ -99,5 +96,18 @@ export class CoreUploadFileManagerService
         }
 
         return coreFile;
+    }
+
+    async uploadFiles(
+        filePayloads: CoreFileUploaded[],
+    ): Promise<CoreFile[]>
+    {
+        const responses = [];
+        for (const filePayload of filePayloads)
+        {
+            const savedFile = this.uploadFile(filePayload);
+            responses.push(savedFile);
+        }
+        return Promise.all(responses);
     }
 }
