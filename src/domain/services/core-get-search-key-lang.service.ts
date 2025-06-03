@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
+import { CoreSearchKeyLang } from '../types';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { CoreSearchKeyLang } from '../aurora.types';
+
 
 @Injectable()
 export class CoreGetSearchKeyLangService

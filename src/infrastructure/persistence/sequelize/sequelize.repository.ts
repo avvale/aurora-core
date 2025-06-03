@@ -1,15 +1,12 @@
 /* eslint-disable max-len */
-import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { AuditingRunner, ICriteria, IRepository, QueryStatement } from '../../../domain/persistence';
+import { AggregateBase, IMapper, Pagination } from '../../../domain/shared';
+import { CQMetadata, HookResponse, LiteralObject } from '../../../domain/types';
+import { UuidValueObject } from '../../../domain/value-objects';
+import { setSequelizeIncrementFunction } from '../../persistence';
+import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
 import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
-import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
-import { CQMetadata, HookResponse, LiteralObject } from '../../../domain/aurora.types';
-import { AuditingRunner, ICriteria, IRepository } from '../../../domain';
-import { IMapper } from '../../../domain/shared/mapper';
-import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
-import { AggregateBase } from '../../../domain/shared/aggregate-base';
-import { Pagination } from '../../../domain/shared/pagination';
-import { setSequelizeIncrementFunction } from './functions/set-sequelize-increment.function';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');

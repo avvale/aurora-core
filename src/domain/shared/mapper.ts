@@ -1,5 +1,5 @@
+import { CQMetadata, LiteralObject } from '../types';
 import { AggregateBase } from './aggregate-base';
-import { CQMetadata, LiteralObject } from '../aurora.types';
 
 export interface IMapper
 {

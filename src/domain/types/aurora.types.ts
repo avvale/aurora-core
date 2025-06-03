@@ -1,5 +1,5 @@
-import { QueryStatement } from './persistence/sql-statement/sql-statement';
-import { AuditingRunner } from './persistence/auditing-runner';
+import { QueryStatement } from '../persistence/sql-statement/sql-statement';
+import { AuditingRunner } from '../persistence/auditing-runner';
 
 export interface AuditingAccount
 {
@@ -38,6 +38,48 @@ export enum AuditingSideEffectEvent
     RESTORED = 'RESTORED',
     BULK_RESTORED = 'BULK_RESTORED',
     UPSERTED = 'UPSERTED'
+}
+
+export interface CoreFileUploaded
+{
+    id: string;
+    file: any;
+    relativePathSegments?: string[];
+    containerName?: string
+    hasCreateLibrary?: boolean;
+}
+
+export interface CoreFile {
+    id: string;
+    originFilename: string;
+    filename: string;
+    mimetype: string;
+    extension: string;
+    relativePathSegments: string[];
+    width?: number;
+    height?: number;
+    size: number;
+    url: string;
+    isCropable: boolean;
+    isUploaded: boolean;
+    libraryId?: string;
+    libraryFilename?: string;
+    library?: CoreLibraryFile;
+    meta?: any;
+}
+
+export interface CoreLibraryFile {
+    id: string;
+    originFilename: string;
+    filename: string;
+    mimetype: string;
+    extension: string;
+    relativePathSegments: string[];
+    width: number;
+    height: number;
+    size: number;
+    url: string;
+    meta?: any;
 }
 
 export enum CoreSearchKeyLang

@@ -1,4 +1,4 @@
-import { LiteralObject } from '../aurora.types';
+import { LiteralObject } from '../types';
 import { TimestampValueObject } from '../value-objects/timestamp.value-object';
 import { UuidValueObject } from '../value-objects/uuid.value-object';
 

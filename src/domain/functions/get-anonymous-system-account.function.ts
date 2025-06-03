@@ -1,4 +1,4 @@
-import { AuditingAccount } from '../aurora.types';
+import { AuditingAccount } from '../types';
 
 export const getAnonymousSystemAccount = (): AuditingAccount =>
 {

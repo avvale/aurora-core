@@ -6,7 +6,7 @@ import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-st
 import { IRepository } from '../../../domain/persistence/repository';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
 import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
-import { CQMetadata, LiteralObject } from '../../../domain/aurora.types';
+import { CQMetadata, LiteralObject } from '../../../domain/types';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');

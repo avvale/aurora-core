@@ -2,8 +2,8 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Cache } from 'cache-manager';
-import { CoreSearchKeyLang } from '../../domain/aurora.types';
 import { QueryStatement } from '../../domain/persistence';
+import { CoreSearchKeyLang } from '../../domain/types';
 
 @Injectable()
 export class CoreAddI18nConstraintService

@@ -1,5 +1,5 @@
-import { QueryStatement } from './sql-statement/sql-statement';
-import { CQMetadata } from './../aurora.types';
+import { QueryStatement } from '../persistence';
+import { CQMetadata } from '../types';
 
 export abstract class ICriteria
 {

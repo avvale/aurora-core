@@ -1,3 +1,4 @@
+export * from './aggregate-base';
 export * from './collection';
 export * from './dayjs-config';
 export * from './mapper';

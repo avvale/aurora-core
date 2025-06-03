@@ -1,4 +1,4 @@
-import { AuditingMeta } from '../aurora.types';
+import { AuditingMeta } from '../types';
 
 export abstract class AuditingRunner
 {

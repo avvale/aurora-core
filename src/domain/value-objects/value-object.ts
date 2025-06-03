@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { IValueObject } from './value-object.interface';
-import { DataValueObject, ValidationRules } from './../aurora.types';
+import { DataValueObject, ValidationRules } from '../types';
 
 export abstract class ValueObject<T> implements IValueObject<T>
 {

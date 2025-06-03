@@ -5,13 +5,11 @@ import * as dayjs from 'dayjs';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-import { ICriteria } from '../../../domain/persistence/criteria';
-import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
-import { CQMetadata } from '../../../domain/aurora.types';
 import { Utils } from '../../../domain/shared/utils';
-import { Operator } from '../../../domain/persistence/sql-statement/operator';
 import { merge, isEmpty } from 'lodash';
 import { setSequelizeFunctions } from './functions/set-sequelize-functions.function';
+import { CQMetadata } from '../../../domain/types';
+import { ICriteria, Operator, QueryStatement } from '../../../domain/persistence';
 
 export class SequelizeCriteria implements ICriteria
 {

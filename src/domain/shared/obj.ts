@@ -1,4 +1,4 @@
-import { LiteralObject } from '../aurora.types';
+import { LiteralObject } from '../types';
 
 export const obj = (item: LiteralObject): Obj => new Obj(item);
 

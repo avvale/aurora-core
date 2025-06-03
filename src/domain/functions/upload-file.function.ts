@@ -1,11 +1,7 @@
+import { getRelativePathSegments, storagePublicAbsoluteDirectoryPath, storagePublicAbsolutePath, storagePublicAbsoluteURL, storageStream, uuid } from '../functions';
 import { copyFileSync, existsSync, mkdirSync, statSync } from 'node:fs';
 import { extname } from 'node:path';
 import * as sharp from 'sharp';
-import { Utils } from '../shared/utils';
-import { getRelativePathSegments } from './get-relative-path-segments.function';
-import { storagePublicAbsoluteDirectoryPath } from './storage-public-absolute-directory-path.function';
-import { storagePublicAbsolutePath } from './storage-public-absolute-path.function';
-import { storagePublicAbsoluteURL } from './storage-public-absolute-url.function';
 
 interface CoreFileUploaded {
     id: string;
@@ -50,7 +46,10 @@ interface CoreLibraryFile {
 // CoreFileUploaded has relativePathSegments, that is an array
 // of strings that represents the path to the file will be stored.
 // by default, the file will be stored in the tmp directory.
-export const uploadFile = async (file: CoreFileUploaded, hasFileMeta = true): Promise<CoreFile> =>
+export const uploadFile = async (
+    file: CoreFileUploaded,
+    hasFileMeta = true
+): Promise<CoreFile> =>
 {
     // by default all files are saved in the tmp folder, so that after manipulation they are saved in the corresponding folder
     // if it is not necessary to manipulate the file, it can be saved directly in the corresponding folder.
@@ -71,7 +70,7 @@ export const uploadFile = async (file: CoreFileUploaded, hasFileMeta = true): Pr
 
     // promise to store the file in the filesystem.
     // no await here to allow parallel uploads
-    await Utils.storageStream(absolutePath, stream);
+    await storageStream(absolutePath, stream);
 
     // return the file url
     const url = storagePublicAbsoluteURL(relativePathSegments, filename);
@@ -92,14 +91,14 @@ export const uploadFile = async (file: CoreFileUploaded, hasFileMeta = true): Pr
         isCropable,
         isUploaded: true,
         meta      : {
-            fileMeta: hasFileMeta ? isCropable ? await sharp(absolutePath).metadata() : stats : undefined,
+            fileMeta: isCropable ? await sharp(absolutePath).metadata() : stats,
         },
     };
 
     // add cropable properties
     if (isCropable && file.hasCreateLibrary)
     {
-        const libraryId = Utils.uuid();
+        const libraryId = uuid();
         const filename = `${libraryId}${coreFile.extension}`;
         coreFile.libraryId = libraryId;
         coreFile.libraryFilename = filename;
@@ -134,12 +133,12 @@ export const uploadFile = async (file: CoreFileUploaded, hasFileMeta = true): Pr
     return coreFile;
 };
 
-export const uploadFiles = async (files: CoreFileUploaded[], hasFileMeta = true): Promise<CoreFile[]> =>
+export const uploadFiles = async (files: CoreFileUploaded[]): Promise<CoreFile[]> =>
 {
     const responses = [];
     for (const file of files)
     {
-        const savedFile = await uploadFile(file, hasFileMeta);
+        const savedFile = await uploadFile(file);
         responses.push(savedFile);
     }
     return responses;

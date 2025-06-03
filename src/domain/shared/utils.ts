@@ -10,7 +10,7 @@ import { nanoid } from 'nanoid';
 import { createWriteStream, unlink } from 'node:fs';
 import * as path from 'path';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
-import { LiteralObject } from '../aurora.types';
+import { LiteralObject } from '../types';
 declare const Buffer: any;
 
 dayjs.extend(utc);

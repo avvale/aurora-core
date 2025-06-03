@@ -1,5 +1,5 @@
+import { LiteralObject } from '../../../../domain/types';
 import { Sequelize } from 'sequelize';
-import { LiteralObject } from '../../../..';
 
 export const setSequelizeIncrementFunction = (
     payload: LiteralObject,

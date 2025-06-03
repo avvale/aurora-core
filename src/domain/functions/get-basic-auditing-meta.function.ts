@@ -1,5 +1,5 @@
-import { AuditingMeta } from '../aurora.types';
-import { getAnonymousSystemAccount } from './get-anonymous-system-account.function';
+import { getAnonymousSystemAccount } from '../functions';
+import { AuditingMeta } from '../types';
 
 export const getBasicAuditingMeta = (): AuditingMeta =>
 {

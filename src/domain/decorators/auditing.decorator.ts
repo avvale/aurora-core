@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { AuditingMeta } from '../aurora.types';
+import { AuditingMeta } from '../types';
 
 // normally user is implements for @app/o-auth/shared/strategies/jwt.strategy.ts in validate method
 export const Auditing = createParamDecorator(
