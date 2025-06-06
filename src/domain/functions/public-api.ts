@@ -23,5 +23,4 @@ export * from './storage-public-base-path.function';
 export * from './storage-public-base-url.function';
 export * from './storage-stream.function';
 export * from './stream-to-buffer.function';
-export * from './upload-file.function';
 export * from './uuid.function';

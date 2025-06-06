@@ -40,53 +40,6 @@ export enum AuditingSideEffectEvent
     UPSERTED = 'UPSERTED'
 }
 
-export interface CoreFileUploaded
-{
-    id: string;
-    file: any;
-    relativePathSegments?: string[];
-    containerName?: string
-    hasCreateLibrary?: boolean;
-    meta?: any;
-}
-
-export interface CoreBase64File {
-    base64: string;
-}
-
-export interface CoreFile {
-    id: string;
-    originFilename: string;
-    filename: string;
-    mimetype: string;
-    extension: string;
-    relativePathSegments: string[];
-    width?: number;
-    height?: number;
-    size: number;
-    url: string;
-    isCropable: boolean;
-    isUploaded: boolean;
-    libraryId?: string;
-    libraryFilename?: string;
-    library?: CoreLibraryFile;
-    meta?: any;
-}
-
-export interface CoreLibraryFile {
-    id: string;
-    originFilename: string;
-    filename: string;
-    mimetype: string;
-    extension: string;
-    relativePathSegments: string[];
-    width: number;
-    height: number;
-    size: number;
-    url: string;
-    meta?: any;
-}
-
 export enum CoreSearchKeyLang
 {
     ID = 'id',
