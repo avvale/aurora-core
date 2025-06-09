@@ -1,1 +1,1 @@
-export const storagePublicBaseURL = (): string => `${process.env.STORAGE_URL}/${process.env.STORAGE_PUBLIC_PATH}`;
+export const storagePublicBaseURL = (): string => `${process.env.STORAGE_ACCOUNT_URL}/${process.env.STORAGE_ACCOUNT_PUBLIC_PATH}`;
