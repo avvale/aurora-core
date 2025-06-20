@@ -42,7 +42,7 @@ export class AuroraMetadataExplorer implements OnModuleInit
                 this.lookupSchema(instance);
             });
 
-        this.logger.log('Aurora metadata explorer successfully scanned providers');
+        this.logger.log('Aurora metadata explorer successfully scanned providers', AuroraMetadataExplorer.name);
     }
 
     lookupSchema(instance): void

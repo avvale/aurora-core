@@ -16,7 +16,7 @@ export class SequelizeAuditingAgent
 
         if (!auditingMeta)
         {
-            Logger.log(`Event ${event} of ${modelName} model, is not audited`);
+            Logger.log(`Event ${event} of ${modelName} model, is not audited`, SequelizeAuditingAgent.name);
             return;
         }
 
