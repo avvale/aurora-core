@@ -1,4 +1,6 @@
 export * from './add-relationship-include.function';
+export * from './arrays-intersects.function';
+export * from './arrays-contained.function';
 export * from './date-from-format.function';
 export * from './diff.function';
 export * from './extension-from-mimetype.function';
