@@ -1,4 +1,4 @@
-import { arraysContained, arraysIntersects } from '@domain/functions';
+import { arraysContained, arraysIntersects } from '../functions';
 
 export class Arrays
 {
