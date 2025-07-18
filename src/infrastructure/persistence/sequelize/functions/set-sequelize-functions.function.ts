@@ -1,18 +1,26 @@
 import { Sequelize } from 'sequelize';
-import { LiteralObject, QueryStatement } from '../../../..';
+import { CQMetadata, LiteralObject, QueryStatement } from '../../../..';
+import * as utc from 'dayjs/plugin/utc';
+import * as timezone from 'dayjs/plugin/timezone';
+import * as dayjs from 'dayjs';
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 export const setSequelizeFunctions = (
     queryStatement: QueryStatement,
+    cQMetadata: CQMetadata,
     options: {
         setUnaccentValues?: boolean;
+        setTimestamp?: boolean;
     } = {
         setUnaccentValues: false,
+        setTimestamp: false,
     },
 ): LiteralObject =>
 {
     if (Array.isArray(queryStatement))
     {
-        return queryStatement.map(val => setSequelizeFunctions(val));
+        return queryStatement.map(val => setSequelizeFunctions(val, cQMetadata));
     }
     else if (typeof queryStatement === 'object' && queryStatement !== null)
     {
@@ -53,16 +61,21 @@ export const setSequelizeFunctions = (
                             {
                                 // return function instance of object
                                 case 'unaccent':
-                                    return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(parsedColumn)), setSequelizeFunctions(value, { setUnaccentValues: true }));
+                                    return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(parsedColumn)), setSequelizeFunctions(value, cQMetadata, { setUnaccentValues: true }));
 
                                 case 'cast':
-                                    return Sequelize.where(Sequelize.cast(Sequelize.col(parsedColumn), functions[index + 1]), setSequelizeFunctions(value));
+                                    return Sequelize.where(Sequelize.cast(Sequelize.col(parsedColumn), functions[index + 1]), setSequelizeFunctions(value, cQMetadata));
+
+                                case 'timestamp':
+                                    newQueryStatement[parsedColumn] = setSequelizeFunctions(value, cQMetadata, { setTimestamp: true });
+                                    return newQueryStatement;
                             }
                         }
                     }
                     else
                     {
-                        newQueryStatement[key] = setSequelizeFunctions(value);
+                        // if key is a symbol or key without function operator ('::')
+                        newQueryStatement[key] = setSequelizeFunctions(value, cQMetadata);
                     }
                 }
                 else
@@ -93,14 +106,36 @@ export const setSequelizeFunctions = (
 
                                 case 'cast':
                                     return Sequelize.where(Sequelize.cast(Sequelize.col(column), functions[index + 1]), value);
+
+                                case 'timestamp':
+                                    newQueryStatement[column] = value;
+                                    return newQueryStatement;
                             }
                         }
-
                     }
                     else
                     {
-                        // if parent call is unaccent, then the nested values as unaccent
-                        newQueryStatement[key] = options.setUnaccentValues ?  Sequelize.fn('unaccent', value) : value;
+                        if (options.setUnaccentValues)
+                        {
+                            newQueryStatement[key] = Sequelize.fn('unaccent', value);
+                        }
+                        else if (options.setTimestamp)
+                        {
+                            newQueryStatement[key] = value;
+                        }
+                        else if (
+                            typeof value === 'string' &&
+                            cQMetadata?.timezone &&
+                            value.match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/)
+                        )
+                        {
+                            // add timezone to query statement
+                            newQueryStatement[key] = dayjs.tz(value, cQMetadata.timezone).tz(process.env.TZ).format('YYYY-MM-DD HH:mm:ss');
+                        }
+                        else
+                        {
+                            newQueryStatement[key] = value;
+                        }
                     }
                 }
                 return newQueryStatement;
@@ -108,6 +143,7 @@ export const setSequelizeFunctions = (
     }
     else
     {
+        // noting to evaluate
         return queryStatement;
     }
 };

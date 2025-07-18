@@ -1,10 +1,4 @@
 import { Op } from 'sequelize';
-import * as utc from 'dayjs/plugin/utc';
-import * as timezone from 'dayjs/plugin/timezone';
-import * as dayjs from 'dayjs';
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
 import { Utils } from '../../../domain/shared/utils';
 import { merge, isEmpty } from 'lodash';
 import { setSequelizeFunctions } from './functions/set-sequelize-functions.function';
@@ -18,20 +12,6 @@ export class SequelizeCriteria implements ICriteria
         cQMetadata?: CQMetadata,
     ): QueryStatement
     {
-        // add timezone to query statement
-        if (cQMetadata?.timezone)
-        {
-            queryStatement = Utils.deepMapValues(queryStatement, (value, key) =>
-            {
-                if (typeof value === 'string')
-                {
-                    const isDate = value.match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
-                    return isDate ? dayjs.tz(value, cQMetadata.timezone).tz(process.env.TZ).format('YYYY-MM-DD HH:mm:ss') : value;
-                }
-                return value;
-            });
-        }
-
         // get all keys from Operator enum
         const availableOperators = [];
         for (const operator in Operator)
@@ -51,7 +31,7 @@ export class SequelizeCriteria implements ICriteria
         );
 
         // set sequelize functions to query statement
-        queryStatement = setSequelizeFunctions(queryStatement);
+        queryStatement = setSequelizeFunctions(queryStatement, cQMetadata);
 
         return queryStatement;
     }
