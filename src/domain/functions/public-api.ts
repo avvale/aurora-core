@@ -1,6 +1,8 @@
 export * from './add-relationship-include.function';
-export * from './arrays-intersects.function';
 export * from './arrays-contained.function';
+export * from './arrays-intersects.function';
+export * from './base64-decode.function';
+export * from './base64-encode.function';
 export * from './date-from-format.function';
 export * from './diff.function';
 export * from './extension-from-mimetype.function';
@@ -18,6 +20,7 @@ export * from './mimetype-from-extension.function';
 export * from './now-timestamp.function';
 export * from './now.function';
 export * from './object-to-query-params.function';
+export * from './sha1.function';
 export * from './storage-public-absolute-directory-path.function';
 export * from './storage-public-absolute-directory-url.function';
 export * from './storage-public-absolute-path.function';
