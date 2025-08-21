@@ -1,5 +1,5 @@
 export * from './aggregate-base';
-export * from './arrays';
+export * from './arr';
 export * from './collection';
 export * from './dayjs-config';
 export * from './encrypt';

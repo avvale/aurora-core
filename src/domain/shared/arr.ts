@@ -1,6 +1,6 @@
 import { arraysContained, arraysIntersects } from '../functions';
 
-export class Arrays
+export class Arr
 {
     /**
      * Determines whether two arrays have at least one element in common.
@@ -38,5 +38,35 @@ export class Arrays
     public static contained<T = any>(arr1: T[], arr2: T[]): boolean
     {
         return arraysContained(arr1, arr2);
+    }
+
+    /**
+     * Removes specified items from an array.
+     *
+     * @template T - The type of elements in the array.
+     * @param arr - The array from which items will be removed.
+     * @param value - The item or array of items to remove from the array.
+     * @returns A new array with the specified items removed. If `value` is falsy, returns an empty array.
+     */
+    public static removeItems<T = any>(arr: T[], value: T | T[]): T[]
+    {
+        let arrValues: T[];
+        if (Array.isArray(value))
+        {
+            arrValues = value;
+        }
+        else
+        {
+            if (value)
+            {
+                arrValues = [value];
+            }
+            else
+            {
+                return [];
+            }
+        }
+
+        return arr.filter(ele => !arrValues.includes(ele));
     }
 }
