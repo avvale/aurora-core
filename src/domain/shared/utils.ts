@@ -105,31 +105,6 @@ export class Utils
         return changes(newObj, origObj);
     }
 
-    /**
-     * @deprecated Use Array.removeItem instead
-     */
-    public static arrayRemoveItem<T = any>(arr: T[], value: T | T[]): T[]
-    {
-        let arrValues: T[];
-        if (Array.isArray(value))
-        {
-            arrValues = value;
-        }
-        else
-        {
-            if (value)
-            {
-                arrValues = [value];
-            }
-            else
-            {
-                return [];
-            }
-        }
-
-        return arr.filter(ele => !arrValues.includes(ele));
-    }
-
     // determines if two arrays have a common item
     public static arraysIntersects<T = any>(arr1: T[], arr2: T[]): boolean
     {
