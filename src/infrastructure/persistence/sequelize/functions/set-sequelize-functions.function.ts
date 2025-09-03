@@ -6,6 +6,28 @@ import * as dayjs from 'dayjs';
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
+const TIMESTAMP_REGEX = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/;
+
+function isPlainObject(value: unknown): value is Record<PropertyKey, unknown>
+{
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function maybeConvertTimestamp(value: unknown, cQMetadata?: CQMetadata): unknown
+{
+    if (
+        typeof value === 'string' &&
+        cQMetadata?.timezone &&
+        TIMESTAMP_REGEX.test(value)
+    )
+    {
+        // Fallback to system timezone if process.env.TZ is not defined
+        const targetTz = process.env.TZ ?? (dayjs.tz.guess?.() ?? 'UTC');
+        return dayjs.tz(value, cQMetadata.timezone).tz(targetTz).format('YYYY-MM-DD HH:mm:ss');
+    }
+    return value;
+}
+
 export const setSequelizeFunctions = (
     queryStatement: QueryStatement,
     cQMetadata: CQMetadata,
@@ -18,132 +40,127 @@ export const setSequelizeFunctions = (
     },
 ): LiteralObject =>
 {
+    // propagate options through arrays as well
     if (Array.isArray(queryStatement))
     {
-        return queryStatement.map(val => setSequelizeFunctions(val, cQMetadata));
+        return queryStatement.map(val => setSequelizeFunctions(val as unknown as QueryStatement, cQMetadata, options));
     }
-    else if (typeof queryStatement === 'object' && queryStatement !== null)
+
+    if (isPlainObject(queryStatement))
     {
-        // https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Reflect
-        // Reflect.ownKeys, retrieve keys from object, even if they are symbols
-        return Reflect
-            .ownKeys(queryStatement)
-            .map(key => [key, queryStatement[key]])
-            .reduce((newQueryStatement, [key, value]) =>
+        const result: LiteralObject = {};
+
+        // Reflect.ownKeys: includes symbols (i.e., Sequelize operators like Op.or)
+        for (const key of Reflect.ownKeys(queryStatement))
+        {
+            const value = (queryStatement as Record<PropertyKey, unknown>)[key];
+
+            // process function-style keys e.g. 'name::unaccent', 'createdAt::timestamp'
+            if (typeof key === 'string' && key.includes('::'))
             {
-                if (typeof value === 'object' && value !== null)
+                const [rawColumn, ...functions] = key.split('::');
+                const parsedColumn = rawColumn.startsWith('$') && rawColumn.endsWith('$') ? rawColumn.slice(1, -1) : rawColumn;
+
+                for (const [index, fn] of functions.entries())
                 {
-                    if (typeof key !== 'symbol' && key.indexOf('::') > -1)
+                    switch (fn)
                     {
-                        const [column, ...functions] = key.split('::');
-                        for (const [index, fn] of functions.entries())
-                        {
-                            // if column start with '$' and end with '$' then remove it when use unaccent or cast, because use the Sequelize.col function.
-                            const parsedColumn = column.startsWith('$') && column.endsWith('$') ? column.slice(1, -1) : column;
-
-                            /********************************************************************************
-                            *   return function instance of object, should be a array position, example:
-                            *   [Op.or]: [
-                            *       {
-                            *           'name::unaccent': {
-                            *               [iLike]: 'Hello'
-                            *           }
-                            *       }
-                            *   ]
-                            *
-                            *   [Op.or]: [
-                            *       Sequelize.where(Sequelize.fn('unaccent', Sequelize.col('name')), {
-                            *               [iLike]: Sequelize.fn('unaccent', 'Hello')
-                            *       })
-                            *   ]
-                            ********************************************************************************/
-                            switch (fn)
+                        case 'unaccent':
+                            if (isPlainObject(value) || Array.isArray(value))
                             {
-                                // return function instance of object
-                                case 'unaccent':
-                                    return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(parsedColumn)), setSequelizeFunctions(value, cQMetadata, { setUnaccentValues: true }));
-
-                                case 'cast':
-                                    return Sequelize.where(Sequelize.cast(Sequelize.col(parsedColumn), functions[index + 1]), setSequelizeFunctions(value, cQMetadata));
-
-                                case 'timestamp':
-                                    newQueryStatement[parsedColumn] = setSequelizeFunctions(value, cQMetadata, { setTimestamp: true });
-                                    return newQueryStatement;
+                                // return Sequelize.where(...) at this level
+                                return Sequelize.where(
+                                    Sequelize.fn('unaccent', Sequelize.col(parsedColumn)),
+                                    setSequelizeFunctions(value as QueryStatement, cQMetadata, { ...options, setUnaccentValues: true }),
+                                );
                             }
-                        }
+                            else
+                            {
+                                return Sequelize.where(
+                                    Sequelize.fn('unaccent', Sequelize.col(parsedColumn)),
+                                    Sequelize.fn('unaccent', value as unknown as string),
+                                );
+                            }
+
+                        case 'cast':
+                            {
+                                const castType = functions[index + 1];
+                                if (isPlainObject(value) || Array.isArray(value))
+                                {
+                                    return Sequelize.where(
+                                        Sequelize.cast(Sequelize.col(parsedColumn), castType as any),
+                                        setSequelizeFunctions(value as QueryStatement, cQMetadata, options),
+                                    );
+                                }
+                                else
+                                {
+                                    return Sequelize.where(
+                                        Sequelize.cast(Sequelize.col(parsedColumn), castType as any),
+                                        value as unknown as string,
+                                    );
+                                }
+                            }
+
+                        case 'timestamp':
+                            if (isPlainObject(value) || Array.isArray(value))
+                            {
+                                result[parsedColumn] = setSequelizeFunctions(value as QueryStatement, cQMetadata, { ...options, setTimestamp: true });
+                            }
+                            else
+                            {
+                                result[parsedColumn] = value;
+                            }
+                            // continue to next key
+                            continue;
                     }
-                    else
-                    {
-                        // if key is a symbol or key without function operator ('::')
-                        newQueryStatement[key] = setSequelizeFunctions(value, cQMetadata);
-                    }
+                }
+            }
+
+            // process table-referenced columns using Sequelize.col, e.g. 'User.name'
+            if (typeof key === 'string' && key.includes('.') && !key.includes('::'))
+            {
+                const rawCol = key;
+                const parsedCol = rawCol.startsWith('$') && rawCol.endsWith('$') ? rawCol.slice(1, -1) : rawCol;
+
+                if (isPlainObject(value) || Array.isArray(value))
+                {
+                    return Sequelize.where(
+                        Sequelize.col(parsedCol),
+                        setSequelizeFunctions(value as QueryStatement, cQMetadata, options),
+                    );
                 }
                 else
                 {
-                    // if value is primitive value and contains '::' then is a function
-                    if (typeof key !== 'symbol' && key.indexOf('::') > -1)
-                    {
-                        const [column, ...functions] = key.split('::');
-                        for (const [index, fn] of functions.entries())
-                        {
-                            /********************************************************************************
-                            *   return function instance of object, should be a array position, example:
-                            *   [ Op.or]: [
-                            *       {
-                            *         name: 'Hello'
-                            *       }
-                            *   ]
-                            *
-                            *   [Op.or]: [
-                            *       Sequelize.where(Sequelize.fn('unaccent', Sequelize.col('name')), 'Hello')
-                            *   ]
-                            ********************************************************************************/
-                            switch (fn)
-                            {
-                                // return function instance of object
-                                case 'unaccent':
-                                    return Sequelize.where(Sequelize.fn('unaccent', Sequelize.col(column)), Sequelize.fn('unaccent', value));
-
-                                case 'cast':
-                                    return Sequelize.where(Sequelize.cast(Sequelize.col(column), functions[index + 1]), value);
-
-                                case 'timestamp':
-                                    newQueryStatement[column] = value;
-                                    return newQueryStatement;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (options.setUnaccentValues)
-                        {
-                            newQueryStatement[key] = Sequelize.fn('unaccent', value);
-                        }
-                        else if (options.setTimestamp)
-                        {
-                            newQueryStatement[key] = value;
-                        }
-                        else if (
-                            typeof value === 'string' &&
-                            cQMetadata?.timezone &&
-                            value.match(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/)
-                        )
-                        {
-                            // add timezone to query statement
-                            newQueryStatement[key] = dayjs.tz(value, cQMetadata.timezone).tz(process.env.TZ).format('YYYY-MM-DD HH:mm:ss');
-                        }
-                        else
-                        {
-                            newQueryStatement[key] = value;
-                        }
-                    }
+                    const processed = options.setTimestamp ? value : maybeConvertTimestamp(value, cQMetadata);
+                    return Sequelize.where(Sequelize.col(parsedCol), processed as any);
                 }
-                return newQueryStatement;
-            }, {});
+            }
+
+            // non-function key or symbol key
+            if (isPlainObject(value) || Array.isArray(value))
+            {
+                (result as any)[key as any] = setSequelizeFunctions(value as QueryStatement, cQMetadata, options);
+            }
+            else
+            {
+                if (options.setUnaccentValues)
+                {
+                    (result as any)[key as any] = Sequelize.fn('unaccent', value);
+                }
+                else if (options.setTimestamp)
+                {
+                    (result as any)[key as any] = value;
+                }
+                else
+                {
+                    (result as any)[key as any] = maybeConvertTimestamp(value, cQMetadata);
+                }
+            }
+        }
+
+        return result;
     }
-    else
-    {
-        // noting to evaluate
-        return queryStatement;
-    }
+
+    // nothing to evaluate for primitives
+    return queryStatement as unknown as LiteralObject;
 };
