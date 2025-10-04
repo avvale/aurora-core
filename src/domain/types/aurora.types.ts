@@ -1,5 +1,6 @@
 import { QueryStatement } from '../persistence/sql-statement/sql-statement';
 import { AuditingRunner } from '../persistence/auditing-runner';
+import e = require('express');
 
 export interface AuditingAccount
 {
@@ -112,6 +113,12 @@ export interface SeederPermission
     name: string;
     boundedContextId: string;
     roleIds?: string[];
+}
+
+export enum Timezone
+{
+    UTC = 'UTC',
+    EUROPE_MADRID = 'Europe/Madrid',
 }
 
 export interface ValidationRules
