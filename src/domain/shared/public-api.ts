@@ -1,6 +1,7 @@
 export * from './aggregate-base';
 export * from './arr';
 export * from './collection';
+export * from './date-time';
 export * from './dayjs-config';
 export * from './encrypt';
 export * from './fs';
