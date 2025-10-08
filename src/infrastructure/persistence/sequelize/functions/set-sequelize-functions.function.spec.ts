@@ -5,6 +5,9 @@ import { Op, Sequelize as SequelizeCore } from 'sequelize';
 describe('setSequelizeFunctions', () =>
 {
     const cQMetadata = { timezone: 'Europe/Madrid' };
+    afterEach(() => {
+        delete process.env.TZ;
+    });
 
     test('should return the same empty object', () => {
         expect(setSequelizeFunctions({}, cQMetadata)).toStrictEqual({});
@@ -111,5 +114,79 @@ describe('setSequelizeFunctions', () =>
         expect(w2['$territorial.country$'].attribute.args[0].col).toBe('territorial.country');
         expect(w2['$territorial.country$'].logic[Op.like].fn).toBe('unaccent');
         expect(w2['$territorial.country$'].logic[Op.like].args[0]).toBe('%Aragon%');
+    });
+
+    test('should convert timestamp values within nested conditions', () => {
+        process.env.TZ = 'UTC';
+        const input = {
+            where: {
+                [Op.or]: [
+                    { createdAt: '2023-01-01 12:00:00' },
+                    { deletedAt: null },
+                ],
+            },
+        };
+
+        const result: any = setSequelizeFunctions(input, cQMetadata);
+        expect(result.where[Op.or][0].createdAt).toBe('2023-01-01 11:00:00');
+        expect(result.where[Op.or][1]).toEqual({ deletedAt: null });
+    });
+
+    test('should keep timestamp arrays untouched when using ::timestamp', () => {
+        process.env.TZ = 'UTC';
+        const input = {
+            where: {
+                'createdAt::timestamp': {
+                    [Op.between]: [
+                        '2023-01-01 12:00:00',
+                        '2023-01-02 12:00:00',
+                    ],
+                },
+            },
+        };
+
+        const result: any = setSequelizeFunctions(input, cQMetadata);
+        expect(result.where.createdAt[Op.between]).toEqual([
+            '2023-01-01 12:00:00',
+            '2023-01-02 12:00:00',
+        ]);
+    });
+
+    test('should propagate options through arrays of statements', () => {
+        const input = [
+            {
+                where: {
+                    'name::unaccent': {
+                        [Op.like]: '%José%',
+                    },
+                },
+            },
+            {
+                where: {
+                    'createdAt::timestamp': {
+                        [Op.gt]: '2023-01-01 12:00:00',
+                    },
+                },
+            },
+        ];
+
+        const result: any = setSequelizeFunctions(input, cQMetadata);
+        expect(result).toHaveLength(2);
+        expect(result[0].where.name.attribute.fn).toBe('unaccent');
+        expect(result[0].where.name.logic[Op.like].fn).toBe('unaccent');
+        expect(result[0].where.name.logic[Op.like].args[0]).toBe('%José%');
+        expect(result[1].where.createdAt[Op.gt]).toBe('2023-01-01 12:00:00');
+    });
+
+    test('should not convert timestamps when metadata lacks timezone', () => {
+        process.env.TZ = 'UTC';
+        const input = {
+            where: {
+                createdAt: '2023-01-01 12:00:00',
+            },
+        };
+
+        const result = setSequelizeFunctions(input, {} as any);
+        expect(result.where.createdAt).toBe('2023-01-01 12:00:00');
     });
 });

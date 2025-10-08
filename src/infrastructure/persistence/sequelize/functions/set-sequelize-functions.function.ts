@@ -32,7 +32,7 @@ export const setSequelizeFunctions = (
     {
         const value = currentStatement[key];
 
-        // sequelize function application area by key
+        // sequelize function application zone by key
         // process function-style keys e.g. 'name::unaccent', 'status::cast::varchar', 'createdAt::timestamp'
         if (typeof key === 'string' && key.includes('::'))
         {
@@ -100,7 +100,7 @@ export const setSequelizeFunctions = (
             }
         }
 
-        // sequelize function application area by value
+        // sequelize function application zone by value
         if (!isPlainObject(value) && !Array.isArray(value))
         {
             if (options.setUnaccentValues) currentStatement[key] = Sequelize.fn('unaccent', value);
