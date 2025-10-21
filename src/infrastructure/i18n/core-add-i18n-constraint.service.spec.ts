@@ -3,7 +3,7 @@ import { CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { CoreAddI18nConstraintService } from './core-add-i18n-constraint.service';
-import { CoreSearchKeyLang } from '../../domain/aurora.types';
+import { CoreSearchKeyLang } from '../../domain/types';
 
 const langs = [
     { id: '94c893c1-3eb7-4f22-a878-b405c6d42e09', name: 'Deutsch',   image: 'de', iso6392: 'de', iso6393: 'deu', ietf: 'de-DE', customCode: null, dir: 'RTL', sort: 0, isActive: false },

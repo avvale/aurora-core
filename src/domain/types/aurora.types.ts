@@ -57,10 +57,11 @@ export interface CQMetadata
 
 export interface DataValueObject
 {
-    haveToEncrypt?: boolean;
-    currentTimestamp?: boolean;
-    currentDate?: boolean;
     addTimezone?: string;
+    currentDate?: boolean;
+    currentTimestamp?: boolean;
+    haveToDecrypt?: boolean;
+    haveToEncrypt?: boolean;
     removeTimezone?: string;
 }
 

@@ -1,12 +1,12 @@
 import { StringValueObject } from './string.value-object';
-import { Utils } from '../shared/utils';
+import { Crypt } from '../shared';
 
 export abstract class PasswordValueObject extends StringValueObject
 {
     set value(value: string)
     {
         this.validateStringRules(value);
-        super.value = value && this.data.haveToEncrypt ? Utils.hash(value) : value;
+        super.value = value && this.data.haveToEncrypt ? Crypt.hash(value) : value;
     }
 
     get value(): string
