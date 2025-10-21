@@ -21,7 +21,7 @@ export abstract class EncryptedValueObject extends StringValueObject
 
     get value(): string
     {
-        if (this.data.haveToDecrypt)
+        if (super.value && this.data.haveToDecrypt)
         {
             const privateKey = readFileSync(process.env.OAUTH_PRIVATE_KEY_PATH, 'utf8');
             return Crypt.decrypt(super.value, privateKey);
