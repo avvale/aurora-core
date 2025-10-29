@@ -53,6 +53,7 @@ export interface CQMetadata
     timezone?: string;
     repositoryOptions?: LiteralObject;
     meta?: LiteralObject;
+    excludeMapModelToAggregate?: boolean;
 }
 
 export interface DataValueObject
