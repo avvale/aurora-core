@@ -1,9 +1,10 @@
+import { isEmpty, merge } from 'lodash';
 import { Op } from 'sequelize';
-import { Utils } from '../../../domain/shared/utils';
-import { merge, isEmpty } from 'lodash';
-import { setSequelizeFunctions } from './functions/set-sequelize-functions.function';
-import { CQMetadata } from '../../../domain/types';
 import { ICriteria, Operator, QueryStatement } from '../../../domain/persistence';
+import { Obj } from '../../../domain/shared';
+import { CQMetadata } from '../../../domain/types';
+import { transformAttributes } from './functions/set-sequelize-attributes-functions.function';
+import { setSequelizeFunctions } from './functions/set-sequelize-functions.function';
 
 export class SequelizeCriteria implements ICriteria
 {
@@ -21,7 +22,7 @@ export class SequelizeCriteria implements ICriteria
         }
 
         // replace key string by sequelize symbols
-        queryStatement = Utils.deepMapKeysOperators(
+        queryStatement = Obj.deepMapKeysOperators(
             queryStatement,
             key => key.startsWith('[') &&
             key.endsWith(']') &&
@@ -29,6 +30,8 @@ export class SequelizeCriteria implements ICriteria
                 ? Op[key.slice(1,-1)]
                 : key,
         );
+
+        if (queryStatement.attributes) queryStatement.attributes = transformAttributes(queryStatement.attributes);
 
         // set sequelize functions to query statement
         queryStatement = setSequelizeFunctions(queryStatement, cQMetadata);

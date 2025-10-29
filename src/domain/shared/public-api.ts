@@ -7,7 +7,7 @@ export * from './dayjs-config';
 export * from './encrypt';
 export * from './fs';
 export * from './mapper';
-export * from './obj';
+export { Obj } from './obj';
 export * from './pagination';
 export * from './pagination.response';
 export * from './utils';

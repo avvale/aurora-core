@@ -2,7 +2,7 @@ import { LiteralObject } from '../types';
 
 export const obj = (item: LiteralObject): Obj => new Obj(item);
 
-class Obj
+export class Obj
 {
     private _item: LiteralObject;
 
@@ -50,5 +50,22 @@ class Obj
 
         this._item = innerDeepMapValues(this._item, fn);
         return this;
+    }
+
+    static deepMapKeysOperators(obj, fn): LiteralObject
+    {
+        return Array.isArray(obj) ?
+            obj.map(val => Obj.deepMapKeysOperators(val, fn)) :
+            typeof obj === 'object' &&
+            obj.constructor.name !== 'Fn' &&    // avoid manage Sequelize.fn
+            obj.constructor.name !== 'Cast' ?   // avoid manage Sequelize.cast
+                Object.keys(obj).reduce((acc, current) =>
+                {
+                    const key = fn(current);
+                    const val = obj[current];
+                    acc[key] = val !== null && typeof val === 'object' ? Obj.deepMapKeysOperators(val, fn) : val;
+                    return acc;
+                }, {})
+                : obj;
     }
 }
