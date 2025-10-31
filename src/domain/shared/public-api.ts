@@ -10,4 +10,5 @@ export * from './mapper';
 export { Obj } from './obj';
 export * from './pagination';
 export * from './pagination.response';
+export { Str } from './str';
 export * from './utils';

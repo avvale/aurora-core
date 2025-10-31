@@ -65,7 +65,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             total,
             count,
             // exclude mapping models to aggregates, return models directly
-            rows: cQMetadata.excludeMapModelToAggregate ?
+            rows: cQMetadata?.excludeMapModelToAggregate ?
                 rows :
                 <Aggregate[]>this.mapper.mapModelsToAggregates(rows, cQMetadata), // map values to create value objects
         };
@@ -113,7 +113,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
 
         // exclude mapping models to aggregates, return models directly
-        if (cQMetadata.excludeMapModelToAggregate) return model;
+        if (cQMetadata?.excludeMapModelToAggregate) return model;
 
         // map value to create value objects
         return <Aggregate>this.mapper.mapModelToAggregate(model, cQMetadata);
@@ -161,7 +161,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (!model) throw new NotFoundException(`${this.aggregateName} with id: ${id.value}, not found`);
 
         // exclude mapping models to aggregates, return models directly
-        if (cQMetadata.excludeMapModelToAggregate) return model;
+        if (cQMetadata?.excludeMapModelToAggregate) return model;
 
         return <Aggregate>this.mapper.mapModelToAggregate(model, cQMetadata);
     }
@@ -201,7 +201,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         );
 
         // exclude mapping models to aggregates, return models directly
-        if (cQMetadata.excludeMapModelToAggregate) return models;
+        if (cQMetadata?.excludeMapModelToAggregate) return models;
 
         // map values to create value objects
         return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
@@ -233,7 +233,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         );
 
         // exclude mapping models to aggregates, return models directly
-        if (cQMetadata.excludeMapModelToAggregate) return models;
+        if (cQMetadata?.excludeMapModelToAggregate) return models;
 
         // with rawSQL always return array of models
         return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
