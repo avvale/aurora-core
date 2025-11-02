@@ -31,10 +31,10 @@ export abstract class DateValueObject extends StringValueObject
             // create data with application timezone and transform to request timezone to be returned to client
             super.value = dayjs.tz(value, process.env.TZ).tz(this.data.addTimezone).format('YYYY-MM-DD');
         }
-        else if (this.data.removeTimezone)
+        else if (this.data.applyTimezone)
         {
             // create date with request timezone and transform to application timezone to be saved in database
-            super.value = dayjs.tz(value, this.data.removeTimezone).tz(process.env.TZ).format('YYYY-MM-DD');
+            super.value = dayjs.tz(value, this.data.applyTimezone).tz(process.env.TZ).format('YYYY-MM-DD');
         }
         else
         {

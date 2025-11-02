@@ -63,7 +63,7 @@ export interface DataValueObject
     currentTimestamp?: boolean;
     haveToDecrypt?: boolean;
     haveToEncrypt?: boolean;
-    removeTimezone?: string;
+    applyTimezone?: string;
 }
 
 export interface HookResponse
