@@ -13,4 +13,9 @@ export abstract class BigintValueObject extends NumberValueObject
             super.value = value;
         }
     }
+
+    get value(): number
+    {
+        return super.value;
+    }
 }
