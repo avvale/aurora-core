@@ -6,6 +6,7 @@ export * from './date-time';
 export * from './dayjs-config';
 export * from './encrypt';
 export * from './fs';
+export { KeysetPagination } from './keyset-pagination';
 export * from './mapper';
 export { Obj } from './obj';
 export * from './pagination';

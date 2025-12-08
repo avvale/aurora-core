@@ -1,21 +1,30 @@
-import { publicEncrypt, privateDecrypt, randomBytes, createCipheriv, createDecipheriv, createSign, createVerify, constants, createHash } from 'node:crypto';
 import { hashSync } from 'bcrypt';
+import {
+    constants,
+    createCipheriv,
+    createDecipheriv,
+    createHash,
+    createHmac,
+    createSign,
+    createVerify,
+    privateDecrypt,
+    publicEncrypt,
+    randomBytes,
+} from 'node:crypto';
 
-export class Crypt
-{
+export class Crypt {
     // Confidentiality: encrypt with public key (hybrid AES-GCM + RSA-OAEP)
-    static encrypt(
-        plaintext: string,
-        recipientPublicPem: string
-    ): string
-    {
+    static encrypt(plaintext: string, recipientPublicPem: string): string {
         // 1) AES session key and nonce
-        const aesKey = randomBytes(32);           // AES-256
-        const iv = randomBytes(12);               // Recommended 96-bit nonce for GCM
+        const aesKey = randomBytes(32); // AES-256
+        const iv = randomBytes(12); // Recommended 96-bit nonce for GCM
 
         // 2) encrypt data with AES-GCM
         const cipher = createCipheriv('aes-256-gcm', aesKey, iv);
-        const cipherText = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
+        const cipherText = Buffer.concat([
+            cipher.update(plaintext, 'utf8'),
+            cipher.final(),
+        ]);
         const authTag = cipher.getAuthTag();
 
         // 3) wrap the AES key with RSA-OAEP (SHA-256)
@@ -25,7 +34,7 @@ export class Crypt
                 padding: constants.RSA_PKCS1_OAEP_PADDING,
                 oaepHash: 'sha256',
             },
-            aesKey
+            aesKey,
         );
 
         // We concatenate everything into a single base64url string (cleaner than normal base64).
@@ -40,11 +49,7 @@ export class Crypt
     }
 
     // Confidentiality: decrypt with private key
-    static decrypt(
-        payload: string,
-        recipientPrivatePem: string,
-    ): string
-    {
+    static decrypt(payload: string, recipientPrivatePem: string): string {
         const [wrappedKey, iv, authTag, cipherText] = payload.split(':');
 
         const aesKey = privateDecrypt(
@@ -53,10 +58,14 @@ export class Crypt
                 padding: constants.RSA_PKCS1_OAEP_PADDING,
                 oaepHash: 'sha256',
             },
-            Buffer.from(wrappedKey, 'base64')
+            Buffer.from(wrappedKey, 'base64'),
         );
 
-        const decipher = createDecipheriv('aes-256-gcm', aesKey, Buffer.from(iv, 'base64'));
+        const decipher = createDecipheriv(
+            'aes-256-gcm',
+            aesKey,
+            Buffer.from(iv, 'base64'),
+        );
         decipher.setAuthTag(Buffer.from(authTag, 'base64'));
         const plaintext = Buffer.concat([
             decipher.update(Buffer.from(cipherText, 'base64')),
@@ -67,11 +76,7 @@ export class Crypt
     }
 
     // Authenticity: sign with private key (RSASSA-PSS SHA-256)
-    static sign(
-        message: string,
-        senderPrivatePem: string,
-    ): string
-    {
+    static sign(message: string, senderPrivatePem: string): string {
         const sign = createSign('sha256');
         sign.update(message);
         sign.end();
@@ -90,8 +95,7 @@ export class Crypt
         message: string,
         signatureB64: string,
         senderPublicPem: string,
-    ): boolean
-    {
+    ): boolean {
         const verify = createVerify('sha256');
         verify.update(message);
         verify.end();
@@ -102,25 +106,22 @@ export class Crypt
                 padding: constants.RSA_PKCS1_PSS_PADDING,
                 saltLength: 32,
             },
-            Buffer.from(signatureB64, 'base64')
+            Buffer.from(signatureB64, 'base64'),
         );
     }
 
-    static sha1(
-        data: string)
-    : string
-    {
+    static sha1(data: string): string {
         const generator = createHash('sha1');
         generator.update(data);
 
         return generator.digest('hex');
     }
 
-    static hash(
-        password: string,
-        saltRounds = 10,
-    ): string
-    {
+    static hash(password: string, saltRounds = 10): string {
         return hashSync(password, saltRounds);
+    }
+
+    static signature(secret: string, payload: string): string {
+        return createHmac('sha256', secret).update(payload).digest('hex');
     }
 }
