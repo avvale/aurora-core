@@ -1,17 +1,34 @@
 /* eslint-disable max-len */
-import { AuditingRunner, ICriteria, IRepository, QueryStatement } from '../../../domain/persistence';
-import { AggregateBase, IMapper, Pagination } from '../../../domain/shared';
+import {
+    BadRequestException,
+    ConflictException,
+    NotFoundException,
+} from '@nestjs/common';
+import { QueryTypes } from 'sequelize';
+import { Model } from 'sequelize-typescript';
+import {
+    AuditingRunner,
+    ICriteria,
+    IRepository,
+    QueryStatement,
+} from '../../../domain/persistence';
+import {
+    AggregateBase,
+    IMapper,
+    KeysetPagination,
+    Pagination,
+} from '../../../domain/shared';
 import { CQMetadata, HookResponse, LiteralObject } from '../../../domain/types';
 import { UuidValueObject } from '../../../domain/value-objects';
 import { setSequelizeIncrementFunction } from '../../persistence';
-import { BadRequestException, ConflictException, NotFoundException } from '@nestjs/common';
-import { QueryTypes } from 'sequelize';
-import { Model } from 'sequelize-typescript';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
 
-export abstract class SequelizeRepository<Aggregate extends AggregateBase, ModelClass> implements IRepository<Aggregate>
+export abstract class SequelizeRepository<
+    Aggregate extends AggregateBase,
+    ModelClass,
+> implements IRepository<Aggregate>
 {
     public readonly repository: any;
     public readonly criteria: ICriteria;
@@ -19,21 +36,88 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     public readonly mapper: IMapper;
     public readonly auditingRunner: AuditingRunner;
 
-    async paginate(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Pagination<Aggregate>>
-    {
+    async keysetPaginate({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<KeysetPagination<Aggregate>> {
+        if (!queryStatement.limit)
+            throw new BadRequestException(
+                `Limit is required for keyset pagination in ${this.aggregateName} repository`,
+            );
+
+        // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
+        const hookResponse = this.composeStatementKeysetPaginateHook(
+            this.criteria.mergeQueryConstraintStatement(
+                queryStatement,
+                constraint,
+            ),
+            cQMetadata,
+        );
+
+        // set cursor condition, this condition should be implemented from the request to the API.
+        /*
+        { rowId: { [Op.lt]: x }}
+        */
+        const models = await this.repository.findAll(
+            // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
+            cQMetadata?.repositoryOptions,
+        );
+
+        const hasNext = models.length > queryStatement.limit;
+        const rows = hasNext ? models.slice(0, queryStatement.limit) : models;
+        const nextCursor = hasNext ? rows.at(-1).rowId : null;
+
+        const total = await this.repository.sequelize.query(
+            `SELECT reltuples::bigint AS estimate FROM pg_class WHERE relname = '${this.repository.modelName}';`,
+            {
+                type: QueryTypes.SELECT,
+            },
+        );
+
+        return {
+            pageInfo: { hasNext, nextCursor },
+            total,
+            // exclude mapping models to aggregates, return models directly
+            rows: cQMetadata?.excludeMapModelToAggregate
+                ? rows
+                : <Aggregate[]>(
+                      this.mapper.mapModelsToAggregates(rows, cQMetadata)
+                  ), // map values to create value objects
+        };
+    }
+
+    // hook when compose get statement
+    composeStatementKeysetPaginateHook(
+        queryStatement?: QueryStatement,
+        cQMetadata?: CQMetadata,
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
+
+    async paginate({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Pagination<Aggregate>> {
         // manage hook count paginate, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         // we clone constraint to break the reference and to be able to delete attributes later on
-        const hookCountResponse = this.countStatementPaginateHook({ ...constraint }, cQMetadata);
+        const hookCountResponse = this.countStatementPaginateHook(
+            { ...constraint },
+            cQMetadata,
+        );
 
         // remove attributes to count all records, otherwise we will get a SQL error
         delete hookCountResponse.queryStatement.attributes;
@@ -41,7 +125,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // get count total records from sql service library
         const total = await this.repository.count(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookCountResponse.queryStatement, hookCountResponse.cQMetadata),
+            this.criteria.implements(
+                hookCountResponse.queryStatement,
+                hookCountResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -57,7 +144,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // get records
         const { count, rows } = await this.repository.findAndCountAll(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookComposeResponse.queryStatement, hookComposeResponse.cQMetadata),
+            this.criteria.implements(
+                hookComposeResponse.queryStatement,
+                hookComposeResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -65,9 +155,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             total,
             count,
             // exclude mapping models to aggregates, return models directly
-            rows: cQMetadata?.excludeMapModelToAggregate ?
-                rows :
-                <Aggregate[]>this.mapper.mapModelsToAggregates(rows, cQMetadata), // map values to create value objects
+            rows: cQMetadata?.excludeMapModelToAggregate
+                ? rows
+                : <Aggregate[]>(
+                      this.mapper.mapModelsToAggregates(rows, cQMetadata)
+                  ), // map values to create value objects
         };
     }
 
@@ -75,26 +167,27 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     countStatementPaginateHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // hook when compose pagination statement
     composeStatementPaginateHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
-    async find(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate>
-    {
+    async find({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementFindHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -106,11 +199,15 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const model = await this.repository.findOne(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
-        if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
+        if (!model)
+            throw new NotFoundException(`${this.aggregateName} not found`);
 
         // exclude mapping models to aggregates, return models directly
         if (cQMetadata?.excludeMapModelToAggregate) return model;
@@ -123,7 +220,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementFindHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     async findById(
         id: UuidValueObject | undefined,
@@ -136,15 +235,12 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata?: CQMetadata;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<Aggregate>
-    {
+    ): Promise<Aggregate> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementFindByIdHook(
             this.criteria.mergeQueryConstraintStatement(
                 {
-                    where: id
-                        ? { id: id.value }
-                        : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
+                    where: id ? { id: id.value } : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
                 },
                 constraint,
             ),
@@ -154,11 +250,17 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         // value is already mapped
         const model = await this.repository.findOne(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
-        if (!model) throw new NotFoundException(`${this.aggregateName} with id: ${id.value}, not found`);
+        if (!model)
+            throw new NotFoundException(
+                `${this.aggregateName} with id: ${id.value}, not found`,
+            );
 
         // exclude mapping models to aggregates, return models directly
         if (cQMetadata?.excludeMapModelToAggregate) return model;
@@ -170,21 +272,20 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementFindByIdHook(
         queryStatement: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // get multiple records
-    async get(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate[]>
-    {
+    async get({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate[]> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementGetHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -196,7 +297,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const models = await this.repository.findAll(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -204,26 +308,27 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (cQMetadata?.excludeMapModelToAggregate) return models;
 
         // map values to create value objects
-        return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
+        return <Aggregate[]>(
+            this.mapper.mapModelsToAggregates(models, cQMetadata)
+        );
     }
 
     // hook when compose get statement
     composeStatementGetHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // done rawSQL statement
-    async rawSQL(
-        {
-            rawSQL = undefined,
-            cQMetadata = undefined,
-        }: {
-            rawSQL?: string;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate[]>
-    {
+    async rawSQL({
+        rawSQL = undefined,
+        cQMetadata = undefined,
+    }: {
+        rawSQL?: string;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate[]> {
         const models = await this.repository.sequelize.query(
             this.composeStatementRawSQLHook(rawSQL, cQMetadata),
             {
@@ -236,28 +341,29 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         if (cQMetadata?.excludeMapModelToAggregate) return models;
 
         // with rawSQL always return array of models
-        return <Aggregate[]>this.mapper.mapModelsToAggregates(models, cQMetadata);
+        return <Aggregate[]>(
+            this.mapper.mapModelsToAggregates(models, cQMetadata)
+        );
     }
 
     // hook when raw sql is done
     composeStatementRawSQLHook(
         rawSQL: string,
         cQMetadata?: CQMetadata,
-    ): string { return rawSQL; }
+    ): string {
+        return rawSQL;
+    }
 
     // count records
-    async count(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<number>
-    {
+    async count({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<number> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementCountHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -269,7 +375,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
 
         const nRecords = await this.repository.count(
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -280,7 +389,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementCountHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // max records
     async max(
@@ -294,8 +405,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
+    ): Promise<number> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementMaxHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -308,7 +418,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const nMaxRecord = await this.repository.max(
             column,
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -319,7 +432,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementMaxHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // min records
     async min(
@@ -333,8 +448,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
+    ): Promise<number> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementMinHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -347,7 +461,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const nMinRecord = await this.repository.min(
             column,
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -358,7 +475,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementMinHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // sum records
     async sum(
@@ -372,8 +491,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
+    ): Promise<number> {
         // manage hook, merge timezone columns with cQMetadata to overwrite timezone columns, if are defined un cQMetadata
         const hookResponse = this.composeStatementSumHook(
             this.criteria.mergeQueryConstraintStatement(
@@ -386,7 +504,10 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         const nMinRecord = await this.repository.sum(
             column,
             // pass queryStatement and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
-            this.criteria.implements(hookResponse.queryStatement, hookResponse.cQMetadata),
+            this.criteria.implements(
+                hookResponse.queryStatement,
+                hookResponse.cQMetadata,
+            ),
             cQMetadata?.repositoryOptions,
         );
 
@@ -397,7 +518,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     composeStatementSumHook(
         queryStatement?: QueryStatement,
         cQMetadata?: CQMetadata,
-    ): HookResponse { return { queryStatement, cQMetadata }; }
+    ): HookResponse {
+        return { queryStatement, cQMetadata };
+    }
 
     // ******************
     // ** side effects **
@@ -410,34 +533,37 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             createOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toRepository(),
             // arguments to find object and check if object is duplicated
-            finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
+            finderQueryStatement = (aggregate: Aggregate) => ({
+                where: { id: aggregate['id']['value'] },
+            }),
         }: {
             createOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check if exist object in database, if allow save aggregate with the same uuid, update this aggregate in database instead of create it
-        const modelInDB = await this.repository.findOne(finderQueryStatement(aggregate));
+        const modelInDB = await this.repository.findOne(
+            finderQueryStatement(aggregate),
+        );
 
-        if (modelInDB) throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate['id']['value']} already exist in database`);
+        if (modelInDB)
+            throw new ConflictException(
+                `Error to create ${this.aggregateName}, the id ${aggregate['id']['value']} already exist in database`,
+            );
 
-        try
-        {
+        try {
             // set auditingRunner to implement DI in model
-            if (createOptions?.auditing) createOptions.auditing.auditingRunner = this.auditingRunner;
+            if (createOptions?.auditing)
+                createOptions.auditing.auditingRunner = this.auditingRunner;
 
-            const model = await this.repository
-                .create(
-                    dataFactory(aggregate),
-                    createOptions,
-                );
+            const model = await this.repository.create(
+                dataFactory(aggregate),
+                createOptions,
+            );
 
             this.createdAggregateHook(aggregate, model, createOptions);
-        }
-        catch (error)
-        {
+        } catch (error) {
             throw new ConflictException(error.message);
         }
     }
@@ -447,7 +573,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         model: Model<ModelClass>,
         createOptions: LiteralObject,
-    ): Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async insert(
         aggregates: Aggregate[],
@@ -458,8 +586,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             insertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         /********
          *  user insertOptions to add properties like updateOnDuplicate
          *  {
@@ -473,10 +600,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
          */
 
         // set auditingRunner to implement DI in model
-        if (insertOptions?.auditing) insertOptions.auditing.auditingRunner = this.auditingRunner;
+        if (insertOptions?.auditing)
+            insertOptions.auditing.auditingRunner = this.auditingRunner;
 
         await this.repository.bulkCreate(
-            aggregates.map(item => dataFactory(item)),
+            aggregates.map((item) => dataFactory(item)),
             insertOptions,
         );
 
@@ -487,7 +615,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async insertedAggregateHook(
         aggregates: Aggregate[],
         insertOptions: LiteralObject,
-    ):Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async updateById(
         aggregate: Aggregate,
@@ -505,8 +635,7 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check that model exist
         const modelInDB = await this.repository.findOne(
             // pass constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
@@ -521,18 +650,20 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             ),
         );
 
-        if (!modelInDB) throw new NotFoundException(`${this.aggregateName} not found`);
+        if (!modelInDB)
+            throw new NotFoundException(`${this.aggregateName} not found`);
 
         // clean undefined fields, to avoid update undefined fields
         const payload = cleanDeep(dataFactory(aggregate), {
-            nullValues  : false,
+            nullValues: false,
             emptyStrings: false,
             emptyObjects: false,
-            emptyArrays : false,
+            emptyArrays: false,
         });
 
         // set auditingRunner to implement DI in model
-        if (updateByIdOptions?.auditing) updateByIdOptions.auditing.auditingRunner = this.auditingRunner;
+        if (updateByIdOptions?.auditing)
+            updateByIdOptions.auditing.auditingRunner = this.auditingRunner;
 
         const model = await modelInDB.update(payload, updateByIdOptions);
 
@@ -544,7 +675,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         model: Model<ModelClass>,
         updateByIdOptions: LiteralObject,
-    ): Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async update(
         aggregate: Aggregate,
@@ -561,25 +694,24 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check allRows variable to allow update all rows
-        if (
-            !queryStatement ||
-            !queryStatement.where ||
-            updateOptions?.allRows
-        ) throw new BadRequestException('To increment multiple records, you must define a where statement else use allRows: true, property in updateOptions');
+        if (!queryStatement || !queryStatement.where || updateOptions?.allRows)
+            throw new BadRequestException(
+                'To increment multiple records, you must define a where statement else use allRows: true, property in updateOptions',
+            );
 
         // clean undefined fields, to avoid update undefined fields
         const payload = cleanDeep(dataFactory(aggregate), {
-            nullValues  : false,
+            nullValues: false,
             emptyStrings: false,
             emptyObjects: false,
-            emptyArrays : false,
+            emptyArrays: false,
         });
 
         // set auditingRunner to implement DI in model
-        if (updateOptions?.auditing) updateOptions.auditing.auditingRunner = this.auditingRunner;
+        if (updateOptions?.auditing)
+            updateOptions.auditing.auditingRunner = this.auditingRunner;
 
         // execute update statement
         const model = await this.repository.update(
@@ -605,7 +737,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         model: Model<ModelClass>,
         updateOptions: LiteralObject,
-    ): Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async updateAndIncrement(
         aggregate: Aggregate,
@@ -622,25 +756,29 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata?: CQMetadata;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check allRows variable to allow update all rows
         if (
             !queryStatement ||
             !queryStatement.where ||
             updateAndIncrementOptions?.allRows
-        ) throw new BadRequestException('To update and increment multiple records, you must define a where statement else use allRows: true, property in updateAndIncrementOptions');
+        )
+            throw new BadRequestException(
+                'To update and increment multiple records, you must define a where statement else use allRows: true, property in updateAndIncrementOptions',
+            );
 
         // clean undefined fields, to avoid update undefined fields
         const payload = cleanDeep(dataFactory(aggregate), {
-            nullValues  : false,
+            nullValues: false,
             emptyStrings: false,
             emptyObjects: false,
-            emptyArrays : false,
+            emptyArrays: false,
         });
 
         // set auditingRunner to implement DI in model
-        if (updateAndIncrementOptions?.auditing) updateAndIncrementOptions.auditing.auditingRunner = this.auditingRunner;
+        if (updateAndIncrementOptions?.auditing)
+            updateAndIncrementOptions.auditing.auditingRunner =
+                this.auditingRunner;
 
         // execute update statement
         const model = await this.repository.update(
@@ -658,7 +796,11 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             },
         );
 
-        this.updateAndIncrementAggregateHook(aggregate, model, updateAndIncrementOptions);
+        this.updateAndIncrementAggregateHook(
+            aggregate,
+            model,
+            updateAndIncrementOptions,
+        );
     }
 
     // hook called after increment aggregate
@@ -666,7 +808,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
         aggregate: Aggregate,
         model: Model<ModelClass>,
         updateAndIncrementOptions: LiteralObject,
-    ): Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async upsert(
         aggregate: Aggregate,
@@ -677,17 +821,13 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             upsertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // set auditingRunner to implement DI in model
-        if (upsertOptions?.auditing) upsertOptions.auditing.auditingRunner = this.auditingRunner;
+        if (upsertOptions?.auditing)
+            upsertOptions.auditing.auditingRunner = this.auditingRunner;
 
         // execute update statement
-        await this.repository
-            .upsert(
-                dataFactory(aggregate),
-                upsertOptions,
-            );
+        await this.repository.upsert(dataFactory(aggregate), upsertOptions);
 
         this.upsertedAggregateHook(aggregate, upsertOptions);
     }
@@ -696,7 +836,9 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
     async upsertedAggregateHook(
         aggregates: Aggregate,
         upsertOptions: LiteralObject,
-    ):Promise<void> { /**/ }
+    ): Promise<void> {
+        /**/
+    }
 
     async deleteById(
         id: UuidValueObject | undefined,
@@ -711,17 +853,14 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             cQMetadata?: CQMetadata;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check that aggregate exist
         const model = await this.repository.findOne(
             // pass constraint and cQMetadata to criteria, where will use cQMetadata for manage dates or other data
             this.criteria.implements(
                 this.criteria.mergeQueryConstraintStatement(
                     {
-                        where: id
-                            ? { id: id.value }
-                            : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
+                        where: id ? { id: id.value } : findArguments, // if id is a composite key, pass find arguments, example: { key1: value1, key2: value2, ...}
                     },
                     constraint,
                 ),
@@ -729,37 +868,36 @@ export abstract class SequelizeRepository<Aggregate extends AggregateBase, Model
             ),
         );
 
-        if (!model) throw new NotFoundException(`${this.aggregateName} not found`);
+        if (!model)
+            throw new NotFoundException(`${this.aggregateName} not found`);
 
         // set auditingRunner to implement DI in model
-        if (deleteOptions?.auditing) deleteOptions.auditing.auditingRunner = this.auditingRunner;
+        if (deleteOptions?.auditing)
+            deleteOptions.auditing.auditingRunner = this.auditingRunner;
 
         await model.destroy(deleteOptions);
     }
 
-    async delete(
-        {
-            deleteOptions = undefined,
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            deleteOptions?: LiteralObject;
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<void>
-    {
+    async delete({
+        deleteOptions = undefined,
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        deleteOptions?: LiteralObject;
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<void> {
         // check allRows variable to allow delete all rows
-        if (
-            !queryStatement ||
-            !queryStatement.where ||
-            deleteOptions?.allRows
-        ) throw new BadRequestException('To delete multiple records, you must define a where statement');
+        if (!queryStatement || !queryStatement.where || deleteOptions?.allRows)
+            throw new BadRequestException(
+                'To delete multiple records, you must define a where statement',
+            );
 
         // set auditingRunner to implement DI in model
-        if (deleteOptions?.auditing) deleteOptions.auditing.auditingRunner = this.auditingRunner;
+        if (deleteOptions?.auditing)
+            deleteOptions.auditing.auditingRunner = this.auditingRunner;
 
         // check that aggregate exist
         await this.repository.destroy(
