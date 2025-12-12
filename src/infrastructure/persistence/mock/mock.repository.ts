@@ -1,72 +1,74 @@
 /* eslint-disable max-len */
-import { Injectable, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
-import { Pagination } from '../../../domain/shared/pagination';
-import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
+import {
+    BadRequestException,
+    ConflictException,
+    Injectable,
+} from '@nestjs/common';
 import { IRepository } from '../../../domain/persistence/repository';
+import { QueryStatement } from '../../../domain/persistence/sql-statement/sql-statement';
 import { AggregateBase } from '../../../domain/shared/aggregate-base';
-import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
+import { Pagination } from '../../../domain/shared/pagination';
 import { CQMetadata, LiteralObject } from '../../../domain/types';
+import { TimestampValueObject } from '../../../domain/value-objects/timestamp.value-object';
+import { UuidValueObject } from '../../../domain/value-objects/uuid.value-object';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');
 
 @Injectable()
-export abstract class MockRepository<Aggregate extends AggregateBase> implements IRepository<Aggregate>
+export abstract class MockRepository<Aggregate extends AggregateBase>
+    implements IRepository<Aggregate>
 {
     public readonly repository: any;
     public readonly aggregateName: string;
     public collectionSource: Aggregate[];
     public deletedAtInstance: TimestampValueObject;
 
-    get collectionResponse(): any[]
-    {
+    get collectionResponse(): any[] {
         // to match objects, the http output excludes undefined values
-        return this.collectionSource.map(item => cleanDeep(item.toDTO(), {
-            nullValues  : false,
-            emptyStrings: false,
-            emptyObjects: false,
-            emptyArrays : false,
-        }));
+        return this.collectionSource.map((item) =>
+            cleanDeep(item.toDTO(), {
+                nullValues: false,
+                emptyStrings: false,
+                emptyObjects: false,
+                emptyArrays: false,
+            }),
+        );
     }
 
-    async paginate(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Pagination<Aggregate>>
-    {
-        const offset  = queryStatement.offset ? queryStatement.offset : 0;
-        const limit   = queryStatement.limit ? queryStatement.limit : this.collectionSource.length;
+    async paginate({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Pagination<Aggregate>> {
+        const offset = queryStatement.offset ? queryStatement.offset : 0;
+        const limit = queryStatement.limit
+            ? queryStatement.limit
+            : this.collectionSource.length;
 
         return {
             total: this.collectionSource.length,
             count: this.collectionSource.length,
-            rows : this.collectionSource.slice(offset, limit),
+            rows: this.collectionSource.slice(offset, limit),
         };
     }
 
-    async find(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate>
-    {
-        const aggregate = this.collectionSource.find(item => item.id.value === queryStatement.where.id);
-
-        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
+    async find({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate> {
+        const aggregate = this.collectionSource.find(
+            (item) => item.id.value === queryStatement.where.id,
+        );
 
         return aggregate;
     }
@@ -80,56 +82,48 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<Aggregate>
-    {
-        const aggregate = this.collectionSource.find(author => author.id.value === id.value);
+    ): Promise<Aggregate> {
+        const aggregate = this.collectionSource.find(
+            (author) => author.id.value === id.value,
+        );
 
-        if (!aggregate) throw new NotFoundException(`${this.aggregateName} not found`);
+        if (!aggregate) return null;
 
         return aggregate;
     }
 
-    async get(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate[]>
-    {
+    async get({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate[]> {
         return this.collectionSource;
     }
 
     // done rawSQL statement
-    async rawSQL(
-        {
-            rawSQL = undefined,
-            cQMetadata = undefined,
-        }: {
-            rawSQL?: string;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<Aggregate[]>
-    {
+    async rawSQL({
+        rawSQL = undefined,
+        cQMetadata = undefined,
+    }: {
+        rawSQL?: string;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<Aggregate[]> {
         return this.collectionSource;
     }
 
-    async count(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-        } = {},
-    ): Promise<number>
-    {
+    async count({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+    } = {}): Promise<number> {
         return this.collectionSource.length;
     }
 
@@ -144,9 +138,11 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
-        return this.collectionSource.reduce((max, item) => (item[column] > max ? item[column] : max), 0);
+    ): Promise<number> {
+        return this.collectionSource.reduce(
+            (max, item) => (item[column] > max ? item[column] : max),
+            0,
+        );
     }
 
     async min(
@@ -160,9 +156,11 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
-        return this.collectionSource.reduce((min, item) => (item[column] < min ? item[column] : min), 0);
+    ): Promise<number> {
+        return this.collectionSource.reduce(
+            (min, item) => (item[column] < min ? item[column] : min),
+            0,
+        );
     }
 
     async sum(
@@ -176,9 +174,11 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             constraint?: QueryStatement;
             cQMetadata?: CQMetadata;
         } = {},
-    ): Promise<number>
-    {
-        return this.collectionSource.reduce((sum, item) => sum + item[column], 0);
+    ): Promise<number> {
+        return this.collectionSource.reduce(
+            (sum, item) => sum + item[column],
+            0,
+        );
     }
 
     // ******************
@@ -191,16 +191,23 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             createOptions = undefined,
             dataFactory = (aggregate: Aggregate) => aggregate.toDTO(),
             // arguments to find object and check if object is duplicated
-            finderQueryStatement = (aggregate: Aggregate) => ({ where: { id: aggregate['id']['value'] }}),
+            finderQueryStatement = (aggregate: Aggregate) => ({
+                where: { id: aggregate['id']['value'] },
+            }),
         }: {
             createOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             finderQueryStatement?: (aggregate: Aggregate) => QueryStatement;
         } = {},
-    ): Promise<void>
-    {
-        if (this.collectionSource.find(item => item.id.value === aggregate.id.value))
-            throw new ConflictException(`Error to create ${this.aggregateName}, the id ${aggregate.id.value} already exist in database`);
+    ): Promise<void> {
+        if (
+            this.collectionSource.find(
+                (item) => item.id.value === aggregate.id.value,
+            )
+        )
+            throw new ConflictException(
+                `Error to create ${this.aggregateName}, the id ${aggregate.id.value} already exist in database`,
+            );
 
         // create deletedAt null
         aggregate.deletedAt = this.deletedAtInstance;
@@ -217,8 +224,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             insertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         /**/
     }
 
@@ -238,13 +244,11 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check that aggregate exist
         await this.findById(aggregate.id);
 
-        this.collectionSource.map(item =>
-        {
+        this.collectionSource.map((item) => {
             if (item.id.value === aggregate.id.value) return aggregate;
             return item;
         });
@@ -266,10 +270,12 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check allRows variable to allow update all rows
-        if (!queryStatement || !queryStatement.where || updateOptions?.allRows) throw new BadRequestException('To update multiple records, you must define a where statement');
+        if (!queryStatement || !queryStatement.where || updateOptions?.allRows)
+            throw new BadRequestException(
+                'To update multiple records, you must define a where statement',
+            );
     }
 
     async updateAndIncrement(
@@ -288,10 +294,16 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
             findArguments?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check allRows variable to allow increment all rows
-        if (!queryStatement || !queryStatement.where || updateAndIncrementOptions?.allRows) throw new BadRequestException('To update and increment multiple records, you must define a where statement');
+        if (
+            !queryStatement ||
+            !queryStatement.where ||
+            updateAndIncrementOptions?.allRows
+        )
+            throw new BadRequestException(
+                'To update and increment multiple records, you must define a where statement',
+            );
     }
 
     async upsert(
@@ -303,8 +315,7 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             upsertOptions?: LiteralObject;
             dataFactory?: (aggregate: Aggregate) => LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         /**/
     }
 
@@ -319,29 +330,34 @@ export abstract class MockRepository<Aggregate extends AggregateBase> implements
             cQMetadata?: CQMetadata;
             deleteOptions?: LiteralObject;
         } = {},
-    ): Promise<void>
-    {
+    ): Promise<void> {
         // check that aggregate exist
         await this.findById(id);
 
-        this.collectionSource.filter(aggregate => aggregate.id.value !== id.value);
+        this.collectionSource.filter(
+            (aggregate) => aggregate.id.value !== id.value,
+        );
     }
 
-    async delete(
-        {
-            queryStatement = {},
-            constraint = {},
-            cQMetadata = undefined,
-            deleteOptions = undefined,
-        }: {
-            queryStatement?: QueryStatement;
-            constraint?: QueryStatement;
-            cQMetadata?: CQMetadata;
-            deleteOptions?: LiteralObject;
-        } = {},
-    ): Promise<void>
-    {
+    async delete({
+        queryStatement = {},
+        constraint = {},
+        cQMetadata = undefined,
+        deleteOptions = undefined,
+    }: {
+        queryStatement?: QueryStatement;
+        constraint?: QueryStatement;
+        cQMetadata?: CQMetadata;
+        deleteOptions?: LiteralObject;
+    } = {}): Promise<void> {
         // eslint-disable-next-line max-len
-        if (!Array.isArray(queryStatement) || queryStatement.length === 0 || deleteOptions?.allRows) throw new BadRequestException('To delete multiple records, you must define a query statement');
+        if (
+            !Array.isArray(queryStatement) ||
+            queryStatement.length === 0 ||
+            deleteOptions?.allRows
+        )
+            throw new BadRequestException(
+                'To delete multiple records, you must define a query statement',
+            );
     }
 }

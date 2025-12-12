@@ -206,8 +206,7 @@ export abstract class SequelizeRepository<
             cQMetadata?.repositoryOptions,
         );
 
-        if (!model)
-            throw new NotFoundException(`${this.aggregateName} not found`);
+        if (!model) return null;
 
         // exclude mapping models to aggregates, return models directly
         if (cQMetadata?.excludeMapModelToAggregate) return model;
@@ -257,10 +256,7 @@ export abstract class SequelizeRepository<
             cQMetadata?.repositoryOptions,
         );
 
-        if (!model)
-            throw new NotFoundException(
-                `${this.aggregateName} with id: ${id.value}, not found`,
-            );
+        if (!model) return null;
 
         // exclude mapping models to aggregates, return models directly
         if (cQMetadata?.excludeMapModelToAggregate) return model;
