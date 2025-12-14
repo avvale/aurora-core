@@ -11,6 +11,7 @@ import {
     publicEncrypt,
     randomBytes,
 } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 
 export class Crypt {
     // Confidentiality: encrypt with public key (hybrid AES-GCM + RSA-OAEP)
@@ -48,6 +49,14 @@ export class Crypt {
         return parts.join(':'); // 🔸 format: wrappedKey:iv:authTag:cipherText
     }
 
+    static encryptWithAuroraPublicKey(plaintext: string): string {
+        const publicKey = readFileSync(
+            process.env.OAUTH_PUBLIC_KEY_PATH,
+            'utf8',
+        );
+        return Crypt.encrypt(plaintext, publicKey);
+    }
+
     // Confidentiality: decrypt with private key
     static decrypt(payload: string, recipientPrivatePem: string): string {
         const [wrappedKey, iv, authTag, cipherText] = payload.split(':');
@@ -73,6 +82,14 @@ export class Crypt {
         ]);
 
         return plaintext.toString('utf8');
+    }
+
+    static decryptWithAuroraPrivateKey(payload: string): string {
+        const privateKey = readFileSync(
+            process.env.OAUTH_PRIVATE_KEY_PATH,
+            'utf8',
+        );
+        return Crypt.decrypt(payload, privateKey);
     }
 
     // Authenticity: sign with private key (RSASSA-PSS SHA-256)

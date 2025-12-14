@@ -1,30 +1,20 @@
-import { StringValueObject } from './string.value-object';
 import { Crypt } from '../shared';
-import { readFileSync } from 'node:fs';
+import { StringValueObject } from './string.value-object';
 
-export abstract class EncryptedValueObject extends StringValueObject
-{
-    set value(value: string)
-    {
+export abstract class EncryptedValueObject extends StringValueObject {
+    set value(value: string) {
         this.validateStringRules(value);
 
-        if (value && this.data.haveToEncrypt)
-        {
-            const publicKey = readFileSync(process.env.OAUTH_PUBLIC_KEY_PATH, 'utf8');
-            super.value = Crypt.encrypt(value, publicKey)
-        }
-        else
-        {
+        if (value && this.data.haveToEncrypt) {
+            super.value = Crypt.encryptWithAuroraPublicKey(value);
+        } else {
             super.value = value;
         }
     }
 
-    get value(): string
-    {
-        if (super.value && this.data.haveToDecrypt)
-        {
-            const privateKey = readFileSync(process.env.OAUTH_PRIVATE_KEY_PATH, 'utf8');
-            return Crypt.decrypt(super.value, privateKey);
+    get value(): string {
+        if (super.value && this.data.haveToDecrypt) {
+            return Crypt.decryptWithAuroraPrivateKey(super.value);
         }
         return super.value;
     }
