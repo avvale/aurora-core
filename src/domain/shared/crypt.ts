@@ -85,6 +85,8 @@ export class Crypt {
     }
 
     static decryptWithAuroraPrivateKey(payload: string): string {
+        if (typeof payload !== 'string') return null;
+
         const privateKey = readFileSync(
             process.env.OAUTH_PRIVATE_KEY_PATH,
             'utf8',
