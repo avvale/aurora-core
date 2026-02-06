@@ -10,8 +10,7 @@ import * as _ from 'lodash';
  * @returns {string}
  *   The Pascal Cased string.
  */
-String.prototype.toPascalCase = function (this: string): string
-{
-    _.mixin({ pascalCase: _.flow(_.camelCase, _.upperFirst) });
-    return _.pascalCase(this);
+String.prototype.toPascalCase = function (this: string): string {
+  _.mixin({ pascalCase: _.flow(_.camelCase, _.upperFirst) });
+  return _.pascalCase(this);
 };

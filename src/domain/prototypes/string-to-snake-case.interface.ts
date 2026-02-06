@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-declare interface String
-{
-    toSnakeCase(this: string): string;
+declare interface String {
+  toSnakeCase(this: string): string;
 }
 
 // interface declared separate from your implementation to avoid error

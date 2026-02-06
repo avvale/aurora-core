@@ -6,19 +6,19 @@ import { TimestampValueObject } from '../../../domain/value-objects/timestamp.va
 const cleanDeep = require('clean-deep');
 
 @Injectable()
-export abstract class MockSeeder<Aggregate extends AggregateBase>
-{
-    public readonly aggregateName: string;
-    public collectionSource: Aggregate[];
-    public deletedAtInstance: TimestampValueObject;
+export abstract class MockSeeder<Aggregate extends AggregateBase> {
+  public readonly aggregateName: string;
+  public collectionSource: Aggregate[];
+  public deletedAtInstance: TimestampValueObject;
 
-    get collectionResponse(): any[]
-    {
-        return this.collectionSource.map(item => cleanDeep(item.toDTO(), {
-            nullValues  : false,
-            emptyStrings: false,
-            emptyObjects: false,
-            emptyArrays : false
-        }));
-    }
+  get collectionResponse(): any[] {
+    return this.collectionSource.map((item) =>
+      cleanDeep(item.toDTO(), {
+        nullValues: false,
+        emptyStrings: false,
+        emptyObjects: false,
+        emptyArrays: false,
+      }),
+    );
+  }
 }

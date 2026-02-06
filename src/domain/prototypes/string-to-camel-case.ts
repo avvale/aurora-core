@@ -11,7 +11,6 @@ import * as _ from 'lodash';
  * @returns {string}
  *   The Camel Case string.
  */
-String.prototype.toCamelCase = function (this: string): string
-{
-    return _.camelCase(this);
+String.prototype.toCamelCase = function (this: string): string {
+  return _.camelCase(this);
 };

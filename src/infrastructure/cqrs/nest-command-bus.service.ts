@@ -1,16 +1,15 @@
 import { Injectable } from '@nestjs/common';
-import { CommandBus as NestCommandBusImplementation, ICommand } from '@nestjs/cqrs';
+import {
+  ICommand,
+  CommandBus as NestCommandBusImplementation,
+} from '@nestjs/cqrs';
 import { ICommandBus } from '../../domain/cqrs';
 
 @Injectable()
-export class NestCommandBus implements ICommandBus
-{
-    constructor(
-        private readonly commandBus: NestCommandBusImplementation
-    ) {}
+export class NestCommandBus implements ICommandBus {
+  constructor(private readonly commandBus: NestCommandBusImplementation) {}
 
-    async dispatch<T extends ICommand>(command: T): Promise<any>
-    {
-        return await this.commandBus.execute(command);
-    }
+  async dispatch<T extends ICommand>(command: T): Promise<any> {
+    return await this.commandBus.execute(command);
+  }
 }

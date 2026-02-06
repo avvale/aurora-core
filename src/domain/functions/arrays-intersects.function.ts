@@ -12,8 +12,7 @@
  * arraysIntersects(['a', 'b'], ['c', 'd']); // returns false
  * ```
  */
-export const arraysIntersects = <T = any>(arr1: T[], arr2: T[]): boolean =>
-{
-    const arrayUniqueValues = new Set(arr2);
-    return [...new Set(arr1)].some(x => arrayUniqueValues.has(x));
+export const arraysIntersects = <T = any>(arr1: T[], arr2: T[]): boolean => {
+  const arrayUniqueValues = new Set(arr2);
+  return [...new Set(arr1)].some((x) => arrayUniqueValues.has(x));
 };

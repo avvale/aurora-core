@@ -6,19 +6,19 @@ import { getPackageFile } from '../../../domain/functions';
 
 @ApiTags('[core] environment information')
 @Controller('core/environment-information')
-export class CoreEnvironmentInformationController
-{
-    @Get()
-    @ApiOperation({ summary: 'Get server environment information' })
-    @ApiCreatedResponse({ description: 'Version of server obtained from the package.json file' })
-    async main()
-    {
-        const packageFile = getPackageFile();
+export class CoreEnvironmentInformationController {
+  @Get()
+  @ApiOperation({ summary: 'Get server environment information' })
+  @ApiCreatedResponse({
+    description: 'Version of server obtained from the package.json file',
+  })
+  async main() {
+    const packageFile = getPackageFile();
 
-        return {
-            name       : packageFile.name,
-            version    : packageFile.version,
-            environment: env.NODE_ENV,
-        };
-    }
+    return {
+      name: packageFile.name,
+      version: packageFile.version,
+      environment: env.NODE_ENV,
+    };
+  }
 }

@@ -3,14 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { CoreGetSearchKeyLangService } from '../../../domain';
 
 @Injectable()
-export class CoreGetSearchKeyLangHandler
-{
-    constructor(
-        private readonly coreGetSearchKeyLangService: CoreGetSearchKeyLangService,
-    ) {}
+export class CoreGetSearchKeyLangHandler {
+  constructor(
+    private readonly coreGetSearchKeyLangService: CoreGetSearchKeyLangService,
+  ) {}
 
-    main()
-    {
-        return this.coreGetSearchKeyLangService.get();
-    }
+  main() {
+    return this.coreGetSearchKeyLangService.get();
+  }
 }

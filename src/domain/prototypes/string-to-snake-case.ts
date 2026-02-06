@@ -11,7 +11,6 @@ import * as _ from 'lodash';
  * @returns {string}
  *   The Snake Cased string.
  */
-String.prototype.toSnakeCase = function (this: string): string
-{
-    return _.snakeCase(this);
+String.prototype.toSnakeCase = function (this: string): string {
+  return _.snakeCase(this);
 };

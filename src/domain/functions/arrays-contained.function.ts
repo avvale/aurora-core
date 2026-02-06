@@ -12,8 +12,7 @@
  * arraysContained([1, 4], [1, 2, 3]);    // returns false
  * ```
  */
-export const arraysContained = <T = any>(arr1: T[], arr2: T[]): boolean =>
-{
-    const arrayUniqueValues = new Set(arr2);
-    return [...new Set(arr1)].every(x => arrayUniqueValues.has(x));
+export const arraysContained = <T = any>(arr1: T[], arr2: T[]): boolean => {
+  const arrayUniqueValues = new Set(arr2);
+  return [...new Set(arr1)].every((x) => arrayUniqueValues.has(x));
 };

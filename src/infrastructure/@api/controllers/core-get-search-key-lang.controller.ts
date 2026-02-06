@@ -5,17 +5,15 @@ import { CoreGetSearchKeyLangHandler } from '../handlers';
 
 @ApiTags('[core] search key lang')
 @Controller('core/search-key-lang')
-export class CoreGetSearchKeyLangController
-{
-    constructor(
-        private readonly handler: CoreGetSearchKeyLangHandler,
-    ) {}
+export class CoreGetSearchKeyLangController {
+  constructor(private readonly handler: CoreGetSearchKeyLangHandler) {}
 
-    @Get()
-    @ApiOperation({ summary: 'Get search key lang' })
-    @ApiCreatedResponse({ description: 'The record has been successfully returned.' })
-    async main()
-    {
-        return await this.handler.main();
-    }
+  @Get()
+  @ApiOperation({ summary: 'Get search key lang' })
+  @ApiCreatedResponse({
+    description: 'The record has been successfully returned.',
+  })
+  async main() {
+    return await this.handler.main();
+  }
 }

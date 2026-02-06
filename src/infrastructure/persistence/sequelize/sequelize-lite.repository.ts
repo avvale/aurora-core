@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { QueryTypes } from 'sequelize';
 import { Model } from 'sequelize-typescript';
+import { setSequelizeIncrementFunction } from '..';
 import {
   AuditingRunner,
   ICriteria,
@@ -20,7 +21,6 @@ import {
 } from '../../../domain/shared';
 import { CQMetadata, HookResponse, LiteralObject } from '../../../domain/types';
 import { UuidValueObject } from '../../../domain/value-objects';
-import { setSequelizeIncrementFunction } from '../../persistence';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cleanDeep = require('clean-deep');

@@ -9,10 +9,8 @@
  * @returns {string}
  *   The Title Cased string.
  */
-String.prototype.toTitleCase = function (this: string): string
-{
-    return this
-        .split(' ')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-        .join(' ');
+String.prototype.toTitleCase = function (this: string): string {
+  return this.split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
 };

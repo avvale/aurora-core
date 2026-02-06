@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-declare interface String
-{
-    toPascalCase(this: string): string;
+declare interface String {
+  toPascalCase(this: string): string;
 }
 
-declare module _
-{
-    interface LoDashStatic
-    {
-        pascalCase(value: string): string;
-    }
+declare module _ {
+  interface LoDashStatic {
+    pascalCase(value: string): string;
+  }
 }
 
 // interface declared separate from your implementation to avoid error

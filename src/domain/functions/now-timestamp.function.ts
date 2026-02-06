@@ -7,7 +7,6 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 dayjs.extend(advancedFormat);
 
-export const nowTimestamp = (): string =>
-{
-    return dayjs().format('YYYY-MM-DD H:mm:ss');
+export const nowTimestamp = (): string => {
+  return dayjs().format('YYYY-MM-DD H:mm:ss');
 };

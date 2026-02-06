@@ -15,8 +15,8 @@ import './domain/prototypes/string-to-title-case';
 import './domain/prototypes/string-to-title-case.interface';
 
 @Module({
-    imports  : [],
-    providers: [],
-    exports  : [],
+  imports: [],
+  providers: [],
+  exports: [],
 })
 export class CoreModule {}

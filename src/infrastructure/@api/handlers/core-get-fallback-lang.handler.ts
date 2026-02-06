@@ -3,14 +3,12 @@ import { Injectable } from '@nestjs/common';
 import { CoreGetFallbackLangService } from '../../../domain';
 
 @Injectable()
-export class CoreGetFallbackLangHandler
-{
-    constructor(
-        private readonly coreGetFallbackLangService: CoreGetFallbackLangService,
-    ) {}
+export class CoreGetFallbackLangHandler {
+  constructor(
+    private readonly coreGetFallbackLangService: CoreGetFallbackLangService,
+  ) {}
 
-    async main()
-    {
-        return await this.coreGetFallbackLangService.get();
-    }
+  async main() {
+    return await this.coreGetFallbackLangService.get();
+  }
 }
